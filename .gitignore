@@ -1,0 +1,23 @@
+# Installed dependencies and generated output
+node_modules/
+coverage/
+.cache/
+*.log
+
+# Local secrets: never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+
+# Operating system temporary files
+.DS_Store
+Thumbs.db
+Desktop.ini
+~$*
+*.tmp
+
+# Bloodbar.exe and bundled assets intentionally tracked.
+# Published editor profiles in app/data/editor are intentionally tracked.

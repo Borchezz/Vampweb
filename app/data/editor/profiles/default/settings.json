@@ -1,0 +1,33 @@
+{
+  "taskMechanic": "energy-base-dice",
+  "baseDie": 6,
+  "advantageDie": 4,
+  "sympathyMin": -100,
+  "sympathyMax": 100,
+  "sympathyStart": 0,
+  "sympathySections": 7,
+  "mainCharacterSympathyEnabled": true,
+  "interfaceTheme": "classic",
+  "taskDifficultyLevels": [
+    {
+      "id": "easy",
+      "name": "Легко",
+      "value": 7
+    },
+    {
+      "id": "normal",
+      "name": "Нормально",
+      "value": 8
+    },
+    {
+      "id": "hard",
+      "name": "Сложно",
+      "value": 9
+    },
+    {
+      "id": "impossible",
+      "name": "Невозможно",
+      "value": 10
+    }
+  ]
+}

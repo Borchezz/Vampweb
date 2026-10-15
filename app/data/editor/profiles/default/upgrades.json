@@ -1,0 +1,227 @@
+[
+  {
+    "id": "agent-recovery-1",
+    "name": "Улучшение восстановления энергии агента I",
+    "cost": {
+      "money": 15
+    },
+    "description": "Выбранный агент получает +2 к восстановлению энергии.",
+    "buyEffects": [
+      {
+        "type": "agent_parameter_delta",
+        "parameter": "recovery",
+        "amount": 2
+      }
+    ]
+  },
+  {
+    "id": "agent-recovery-2",
+    "name": "Улучшение восстановления энергии агента II",
+    "cost": {
+      "money": 15
+    },
+    "description": "Выбранный агент получает +2 к восстановлению энергии.",
+    "buyEffects": [
+      {
+        "type": "agent_parameter_delta",
+        "parameter": "recovery",
+        "amount": 2
+      }
+    ]
+  },
+  {
+    "id": "second-specialty-1",
+    "name": "Вторая специализация на агента I",
+    "cost": {
+      "money": 15
+    },
+    "description": "Выбранный агент получает вторую специализацию по выбору прототипа.",
+    "buyEffects": []
+  },
+  {
+    "id": "second-specialty-2",
+    "name": "Вторая специализация на агента II",
+    "cost": {
+      "money": 15
+    },
+    "description": "Выбранный агент получает вторую специализацию по выбору прототипа.",
+    "buyEffects": []
+  },
+  {
+    "id": "improved-specialty-1",
+    "name": "Улучшенная специализация для агента I",
+    "cost": {
+      "money": 20
+    },
+    "description": "Выбранный агент бросает дополнительный D4 на своих специализациях.",
+    "buyEffects": []
+  },
+  {
+    "id": "improved-specialty-2",
+    "name": "Улучшенная специализация для агента II",
+    "cost": {
+      "money": 20
+    },
+    "description": "Выбранный агент бросает дополнительный D4 на своих специализациях.",
+    "buyEffects": []
+  },
+  {
+    "id": "flexible-staff",
+    "name": "Покладистые сотрудники",
+    "cost": {
+      "money": 10
+    },
+    "description": "Пассив: в настольной версии позволяет 1 раз в день сбросить одолжение агента.",
+    "buyEffects": []
+  },
+  {
+    "id": "generous-management",
+    "name": "Отзывчивое начальство",
+    "cost": {
+      "money": 15
+    },
+    "description": "Пассив: в настольной версии для каждого агента тянется 2 одолжения.",
+    "buyEffects": []
+  },
+  {
+    "id": "redemption",
+    "name": "Искупление грехов",
+    "cost": {
+      "money": 30
+    },
+    "description": "Установить симпатию выбранного агента на 0.",
+    "buyEffects": [
+      {
+        "type": "agent_parameter_set",
+        "parameter": "sympathy",
+        "value": 0
+      }
+    ]
+  },
+  {
+    "id": "shop-discount",
+    "name": "Скидка в магазине",
+    "cost": {
+      "money": 25
+    },
+    "description": "Сырая кровь в Оптовом магазине стоит 3$ вместо 4$.",
+    "buyEffects": []
+  },
+  {
+    "id": "mass-production-1",
+    "name": "Массовое производство 1",
+    "cost": {
+      "money": 10
+    },
+    "description": "Лавочка варит более крупную партию коктейлей за одно действие.",
+    "buyEffects": []
+  },
+  {
+    "id": "mass-production-2",
+    "name": "Массовое производство 2",
+    "cost": {
+      "money": 12
+    },
+    "description": "Лавочка варит ещё более крупную партию коктейлей за одно действие.",
+    "buyEffects": []
+  },
+  {
+    "id": "playstation-2",
+    "name": "Playstation 2",
+    "cost": {
+      "money": 15
+    },
+    "description": "Посиделки дают +7 симпатии; провал больше не отнимает энергию.",
+    "buyEffects": []
+  },
+  {
+    "id": "office-specialization",
+    "name": "Специализация для офиса",
+    "cost": {
+      "money": 15
+    },
+    "description": "Пожимать руки в Офисе ОВК можно с первой специализацией агента.",
+    "buyEffects": []
+  },
+  {
+    "id": "elder-friend",
+    "name": "Друг стариков",
+    "cost": {
+      "money": 10
+    },
+    "description": "Задачи в Доме престарелых можно делать 2 раза в день.",
+    "buyEffects": []
+  },
+  {
+    "id": "marketing-guru",
+    "name": "Гуру маркетинга",
+    "cost": {
+      "money": 15
+    },
+    "description": "Маркетинговая кампания может вложить 30$ и получить 3 РЕП.",
+    "buyEffects": []
+  },
+  {
+    "id": "opportunity-country",
+    "name": "Страна возможностей",
+    "cost": {
+      "money": 25
+    },
+    "description": "Первая использованная возможность за день сразу обновляется ещё раз.",
+    "buyEffects": []
+  },
+  {
+    "id": "dramatic-serving",
+    "name": "Эффектная подача",
+    "cost": {
+      "money": 15
+    },
+    "description": "Заказы и продажи коктейлей в прототипе получают +2$ к цене коктейля.",
+    "buyEffects": []
+  },
+  {
+    "id": "loyalty-program",
+    "name": "Программа лояльности",
+    "cost": {
+      "money": 15
+    },
+    "description": "За каждые 5 проданных коктейлей получить 1 РЕП.",
+    "buyEffects": []
+  },
+  {
+    "id": "review-system",
+    "name": "Система отзывов",
+    "cost": {
+      "money": 15
+    },
+    "description": "За каждый исполненный заказ получить 1 РЕП.",
+    "buyEffects": []
+  },
+  {
+    "id": "boatman-deal",
+    "name": "Договор с лодочником",
+    "cost": {
+      "money": 10
+    },
+    "description": "Открывает паром Богатеево-Промзона за 1 сырую кровь.",
+    "buyEffects": []
+  },
+  {
+    "id": "ferry-pass",
+    "name": "Абонимент на паромы",
+    "cost": {
+      "money": 10
+    },
+    "description": "Паромы больше не требуют оплаты ресурсами, кроме энергии.",
+    "buyEffects": []
+  },
+  {
+    "id": "hurry-cooldowns",
+    "name": "Поспешишь -- никого не насмешишь",
+    "cost": {
+      "money": 15
+    },
+    "description": "Пассив: в настольной версии все кулдауны на локациях уменьшаются на 1.",
+    "buyEffects": []
+  }
+]

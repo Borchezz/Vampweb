@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="land" x1="120" y1="0" x2="880" y2="860" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#243029"/>
+      <stop offset="0.55" stop-color="#202b27"/>
+      <stop offset="1" stop-color="#172126"/>
+    </linearGradient>
+    <linearGradient id="sea" x1="610" y1="560" x2="980" y2="980" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2c6474"/>
+      <stop offset="1" stop-color="#173342"/>
+    </linearGradient>
+    <filter id="paperNoise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="2" seed="17"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.11"/>
+      </feComponentTransfer>
+      <feBlend mode="soft-light" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+
+  <rect width="1000" height="1000" fill="url(#land)"/>
+  <g opacity="0.16">
+    <path d="M0 300 C100 298 205 320 312 358 C420 397 498 424 610 405" fill="none" stroke="#7eb7dc" stroke-width="16" stroke-linecap="round"/>
+    <path d="M502 -40 C500 74 515 188 548 308 C585 446 566 574 508 704 C464 805 437 900 430 1040" fill="none" stroke="#7eb7dc" stroke-width="18" stroke-linecap="round"/>
+    <path d="M565 522 C625 555 680 623 720 705" fill="none" stroke="#7eb7dc" stroke-width="10" stroke-linecap="round"/>
+  </g>
+
+  <path d="M560 1000 C586 897 642 790 718 703 C786 625 800 575 858 564 C925 552 980 608 1000 690 L1000 1000 Z" fill="url(#sea)" opacity="0.86"/>
+  <path d="M560 1000 C586 897 642 790 718 703 C786 625 800 575 858 564 C925 552 980 608 1000 690" fill="none" stroke="#b79a58" stroke-width="6" opacity="0.45"/>
+  <path d="M780 908 C820 864 895 852 927 897 C960 945 902 999 834 1006 C790 1000 756 955 780 908 Z" fill="#1e3237" stroke="#b79a58" stroke-width="3" opacity="0.62"/>
+  <path d="M904 785 C938 744 999 731 1020 775 C1026 824 972 870 924 870 C895 848 884 818 904 785 Z" fill="#1e3237" stroke="#b79a58" stroke-width="3" opacity="0.55"/>
+
+  <g opacity="0.12">
+    <path d="M55 152 C170 111 305 101 438 133 C563 164 622 129 750 139 C864 148 936 198 983 286" fill="none" stroke="#fff7e6" stroke-width="1.4"/>
+    <path d="M120 492 C242 474 340 482 448 507 C575 536 690 522 806 485" fill="none" stroke="#fff7e6" stroke-width="1.2"/>
+    <path d="M168 725 C300 704 430 716 548 758 C674 803 784 795 925 742" fill="none" stroke="#fff7e6" stroke-width="1.1"/>
+  </g>
+
+  <rect width="1000" height="1000" fill="#000" filter="url(#paperNoise)" opacity="0.2"/>
+</svg>

@@ -1,0 +1,11 @@
+# Keep exact existing bytes. Do not rewrite line endings on checkout.
+* -text
+
+# Mark packaged executable and raster assets as binary.
+*.exe binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary

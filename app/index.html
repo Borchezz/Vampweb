@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>bloodbar - main</title>
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <button class="secondary-button debug-toggle-button" id="debugToggleButton" type="button" aria-expanded="false" aria-label="Открыть чит-панель">
+        <span class="button-icon" aria-hidden="true">⚗</span>
+      </button>
+      <button class="secondary-button mode-toggle-button" id="modeToggleButton" type="button">
+        <span class="button-icon" aria-hidden="true">✎</span>
+        Редактор
+      </button>
+      <section class="game-board" data-phase-surface="daytime">
+        <section class="city-area" aria-label="Карта города">
+          <button class="secondary-button map-restart-button" id="restartButton" type="button">
+            <span class="button-icon" aria-hidden="true">↺</span>
+            Начать сначала
+          </button>
+          <button class="secondary-button settings-toggle-button" id="settingsToggleButton" type="button">
+            <span class="button-icon" aria-hidden="true">⚙</span>
+            Настройки
+          </button>
+          <button class="secondary-button inventory-toggle-button" id="inventoryToggleButton" type="button" aria-expanded="false" aria-label="Инвентарь">
+            <svg class="side-toggle-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M5 8.5h14v9.5H5z"></path>
+              <path d="M8 8.5V6.8A2.8 2.8 0 0 1 10.8 4h2.4A2.8 2.8 0 0 1 16 6.8v1.7"></path>
+              <path d="M5 12h14"></path>
+            </svg>
+          </button>
+          <button class="secondary-button journal-toggle-button" id="journalToggleButton" type="button" aria-expanded="false" aria-label="Журнал">
+            <svg class="side-toggle-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 5.5h5a3 3 0 0 1 3 3V19a3 3 0 0 0-3-3H6z"></path>
+              <path d="M14 8.5a3 3 0 0 1 3-3h1v10.5h-1a3 3 0 0 0-3 3"></path>
+              <path d="M8.2 9.2h2.4"></path>
+              <path d="M8.2 12h2.4"></path>
+            </svg>
+          </button>
+          <button class="secondary-button upgrade-toggle-button" id="upgradeToggleButton" type="button" aria-expanded="false" aria-label="Апгрейды">
+            <svg class="side-toggle-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 4.5v15"></path>
+              <path d="M7.5 9 12 4.5 16.5 9"></path>
+              <path d="M6 19.5h12"></path>
+              <path d="M8.2 14.5h7.6"></path>
+            </svg>
+          </button>
+          <button class="secondary-button bar-toggle-button" id="barToggleButton" type="button" aria-expanded="false" aria-label="Бар">
+            <svg class="side-toggle-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M8 4.5h8"></path>
+              <path d="M9.5 4.5v5.2l-3.3 6.6A2.3 2.3 0 0 0 8.3 19.5h7.4a2.3 2.3 0 0 0 2.1-3.2l-3.3-6.6V4.5"></path>
+              <path d="M8.2 14h7.6"></path>
+            </svg>
+          </button>
+          <div class="editor-profile-bar" id="editorProfileBar" aria-label="Профили редактора" aria-hidden="true"></div>
+          <aside class="inventory-panel" id="inventoryPanel" aria-label="Инвентарь" aria-hidden="true">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Склад</p>
+                <h2>Инвентарь</h2>
+              </div>
+              <button id="closeInventoryButton" class="icon-button" type="button" aria-label="Закрыть инвентарь">
+                x
+              </button>
+            </div>
+            <section class="inventory-section" aria-label="Ресурсы">
+              <div class="inventory-section-heading">
+                <h3>Ресурсы</h3>
+                <span>Смена</span>
+              </div>
+              <div class="inventory-resource-list" id="resourceStrip" aria-label="Ресурсы"></div>
+            </section>
+            <section class="inventory-section inventory-placeholder" aria-label="Предметы">
+              <div class="inventory-section-heading">
+                <h3>Предметы</h3>
+                <span>позже</span>
+              </div>
+              <p class="muted">Здесь появятся предметы, когда они будут добавлены в правила.</p>
+            </section>
+          </aside>
+          <aside class="journal-panel" id="journalPanel" aria-label="Журнал" aria-hidden="true">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">День</p>
+                <h2>Журнал</h2>
+              </div>
+              <button id="closeJournalButton" class="icon-button" type="button" aria-label="Закрыть журнал">
+                x
+              </button>
+            </div>
+            <section class="journal-section" aria-label="Текущее событие">
+              <div class="inventory-section-heading">
+                <h3>Событие</h3>
+                <span id="journalDayLabel">День 1</span>
+              </div>
+              <div class="journal-event-card" id="journalCurrentEvent"></div>
+            </section>
+          </aside>
+          <aside class="upgrade-panel" id="upgradePanel" aria-label="Апгрейды" aria-hidden="true">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Магазин</p>
+                <h2>Апгрейды</h2>
+              </div>
+              <button id="closeUpgradesButton" class="icon-button" type="button" aria-label="Закрыть апгрейды">
+                x
+              </button>
+            </div>
+            <div class="upgrade-list" id="upgradeList"></div>
+          </aside>
+          <aside class="bar-panel" id="barPanel" aria-label="Бар" aria-hidden="true">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Заведение</p>
+                <h2>Бар</h2>
+              </div>
+              <button id="closeBarButton" class="icon-button" type="button" aria-label="Закрыть бар">x</button>
+            </div>
+            <div class="bar-panel-content" id="barPanelContent"></div>
+          </aside>
+          <div class="city-map" id="cityMap"></div>
+          <div class="map-day-label" id="dayCounter" aria-live="polite">День 1</div>
+          <button class="primary-button map-next-day-button" id="nextDayButton" type="button">
+            <span class="button-icon" aria-hidden="true">→</span>
+            Новый день
+          </button>
+          <aside class="agent-dock" aria-label="Агенты">
+            <div class="agent-energy-summary" id="agentEnergySummary" aria-live="polite"></div>
+            <div class="agent-list" id="agentList"></div>
+          </aside>
+        </section>
+
+        <aside id="routePlanner" class="route-planner" aria-label="Маршрут агента"></aside>
+
+        <aside class="settings-panel" id="settingsPanel" aria-label="Настройки прототипа" aria-hidden="true">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Правила</p>
+              <h2>Настройки</h2>
+            </div>
+            <button id="closeSettingsButton" class="icon-button" type="button" aria-label="Закрыть настройки">
+              x
+            </button>
+          </div>
+          <div class="settings-tabs" role="tablist" aria-label="Разделы настроек">
+            <button class="settings-tab" id="settingsTasksTab" type="button" role="tab" data-settings-tab="tasks" aria-controls="settingsTasksPanel">
+              Задачи
+            </button>
+            <button class="settings-tab" id="settingsSympathyTab" type="button" role="tab" data-settings-tab="sympathy" aria-controls="settingsSympathyPanel">
+              Симпатия
+            </button>
+            <button class="settings-tab" id="settingsAppearanceTab" type="button" role="tab" data-settings-tab="appearance" aria-controls="settingsAppearancePanel">
+              Внешний вид
+            </button>
+          </div>
+          <div class="settings-grid" id="settingsTasksPanel" role="tabpanel" aria-labelledby="settingsTasksTab" data-settings-tab-panel="tasks">
+            <label class="editor-field wide">
+              <span>Механика задач</span>
+              <select id="taskMechanicSelect"></select>
+            </label>
+            <label class="editor-field">
+              <span>Базовый куб</span>
+              <select id="baseDieSelect"></select>
+            </label>
+            <label class="editor-field">
+              <span>Куб преимущества</span>
+              <select id="advantageDieSelect"></select>
+            </label>
+            <div class="settings-section-title wide">
+              <span>Сложность</span>
+            </div>
+            <label class="editor-field wide">
+              <span>Уровней сложности</span>
+              <input id="taskDifficultyCountInput" type="number" min="1" max="12" step="1" />
+            </label>
+            <div class="settings-difficulty-list wide" id="taskDifficultyList"></div>
+          </div>
+          <div class="settings-grid" id="settingsSympathyPanel" role="tabpanel" aria-labelledby="settingsSympathyTab" data-settings-tab-panel="sympathy">
+            <label class="editor-field">
+              <span>Нижнее значение</span>
+              <input id="sympathyMinInput" type="number" step="1" />
+            </label>
+            <label class="editor-field">
+              <span>Начальное значение</span>
+              <input id="sympathyStartInput" type="number" step="1" />
+            </label>
+            <label class="editor-field">
+              <span>Верхнее значение</span>
+              <input id="sympathyMaxInput" type="number" step="1" />
+            </label>
+            <label class="editor-field">
+              <span>Секции</span>
+              <input id="sympathySectionsInput" type="number" min="3" step="2" />
+            </label>
+            <label class="editor-field wide">
+              <span>Симпатия главного героя</span>
+              <select id="mainCharacterSympathyInput">
+                <option value="enabled">Вкл</option>
+                <option value="disabled">Выкл</option>
+              </select>
+            </label>
+            <div class="settings-sympathy-scale wide" id="sympathyScalePreview"></div>
+          </div>
+          <div class="settings-grid settings-appearance-grid" id="settingsAppearancePanel" role="tabpanel" aria-labelledby="settingsAppearanceTab" data-settings-tab-panel="appearance">
+            <div class="settings-section-title wide">
+              <span>Стиль интерфейса</span>
+            </div>
+            <div class="settings-theme-options wide" role="radiogroup" aria-label="Стиль интерфейса">
+              <label class="settings-theme-option">
+                <input type="radio" name="interfaceTheme" value="classic" />
+                <span>
+                  <strong>Прежний</strong>
+                  <small>Тёмный интерфейс прототипа.</small>
+                </span>
+              </label>
+              <label class="settings-theme-option">
+                <input type="radio" name="interfaceTheme" value="paper" />
+                <span>
+                  <strong>Бумажный</strong>
+                  <small>Блокнот, листы и записки.</small>
+                </span>
+              </label>
+            </div>
+          </div>
+        </aside>
+
+        <aside class="right-panel location-popover" id="locationDetailsPanel" aria-label="Детали локации" aria-hidden="true">
+          <section class="location-panel">
+            <div class="panel-heading">
+              <h2 id="locationName">Локация</h2>
+              <div class="panel-heading-actions">
+                <button id="moveButton" class="secondary-button" type="button" disabled>
+                  <span class="button-icon" aria-hidden="true">></span>
+                  Идти
+                </button>
+                <button id="closeLocationPanelButton" class="icon-button" type="button" aria-label="Закрыть детали локации">
+                  x
+                </button>
+              </div>
+            </div>
+
+            <div class="task-stack" id="taskStack"></div>
+            <div class="location-mechanics" id="locationMechanics" aria-label="Механики локации"></div>
+          </section>
+
+          <section class="bar-panel temporarily-hidden" aria-hidden="true">
+            <div class="panel-heading">
+              <h2>Смена</h2>
+              <span id="barStatus">Готовится к ночи</span>
+            </div>
+            <div class="summary-stack" id="daySummary"></div>
+            <div class="conversion-row">
+              <button class="secondary-button compact-button" id="repToSympathyButton" type="button">
+                1 РЕП -> +2 симпатии
+              </button>
+            </div>
+          </section>
+
+          <section class="log-panel temporarily-hidden" aria-hidden="true">
+            <div class="panel-heading">
+              <h2>Журнал</h2>
+              <button id="clearLogButton" class="icon-button" type="button" aria-label="Очистить журнал">
+                x
+              </button>
+            </div>
+            <ol class="event-log" id="eventLog"></ol>
+          </section>
+        </aside>
+
+        <aside class="right-panel weekend-panel" id="weekendPanel" aria-label="Активности выходных" aria-hidden="true">
+          <section class="location-panel weekend-content">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Выходные</p>
+                <h2>Активности</h2>
+              </div>
+              <span id="weekendDayLabel">Суббота</span>
+            </div>
+            <p class="muted">Выберите две активности. Их эффекты получит главный герой.</p>
+            <div class="weekend-progress" id="weekendProgress"></div>
+            <div class="weekend-activity-list" id="weekendActivityList"></div>
+          </section>
+        </aside>
+
+        <aside class="editor-panel" id="editorPanel" aria-label="Редактор прототипа" aria-hidden="true">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Режим редактирования</p>
+              <h2>Редактор сущностей</h2>
+            </div>
+            <div class="panel-heading-actions">
+              <button class="secondary-button compact-button danger-button reset-editor-button" id="resetEditorDraftButton" type="button" title="Сбросить несохранённые изменения">
+                Сброс
+              </button>
+              <button class="secondary-button compact-button save-editor-button" id="saveEditorButton" type="button">
+                Сохранить
+              </button>
+              <button class="secondary-button compact-button publish-editor-button" id="publishEditorButton" type="button" title="Записать активный профиль в Git-снимок">
+                Опубликовать
+              </button>
+              <button class="secondary-button compact-button" id="collapseEditorButton" type="button">
+                Свернуть
+              </button>
+            </div>
+          </div>
+          <div class="editor-tabs" id="editorTabs" role="tablist" aria-label="Разделы редактора"></div>
+          <div class="editor-content" id="editorContent"></div>
+        </aside>
+
+        <aside class="agent-profile-panel" id="agentProfilePanel" aria-label="Анкета агента" aria-hidden="true" hidden>
+          <section class="agent-profile-dialog" aria-labelledby="agentProfileTitle">
+            <button class="icon-button agent-profile-close" id="closeAgentProfileButton" type="button" aria-label="Закрыть анкету агента">x</button>
+            <div id="agentProfileContent"></div>
+          </section>
+        </aside>
+      </section>
+      <aside class="debug-panel" id="debugPanel" aria-label="Чит-панель" aria-hidden="true" inert>
+        <div id="debugPanelContent"></div>
+      </aside>
+      <section class="nighttime-shell" id="nighttimeRoot" data-phase-surface="nighttime" aria-label="Ночная фаза">
+        <div class="nighttime-shell-heading"><p class="eyebrow">Nighttime</p><h1>Ночная фаза</h1></div>
+      </section>
+    </main>
+
+    <script src="./persistence-config.js"></script>
+    <script type="module" src="./src/game/main.js"></script>
+    <div class="global-tooltip" id="globalTooltip" role="tooltip" hidden></div>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "format": "bloodbar-editor-profiles",
+  "activeProfileId": "default",
+  "profiles": [
+    {
+      "id": "default",
+      "name": "Дефолт"
+    }
+  ]
+}

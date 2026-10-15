@@ -1,0 +1,7 @@
+{
+  "autoServiceLimit": 2,
+  "bloodPerDrink": 2,
+  "priceTier1": 12,
+  "priceTier2": 16,
+  "priceTier3": 20
+}

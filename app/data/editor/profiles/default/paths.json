@@ -1,0 +1,274 @@
+[
+  {
+    "id": "bog-park-bridge",
+    "a": "bogateevo",
+    "b": "parkovy",
+    "type": "bridge",
+    "name": "Мост Богатеево-Парковый",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  },
+  {
+    "id": "old-prom-bridge",
+    "a": "old-city",
+    "b": "promzona",
+    "type": "bridge",
+    "name": "Мост Старый город-Промзона",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": {
+      "x": 43.35,
+      "y": 45.88
+    },
+    "bendEnabled": false,
+    "bend": null,
+    "to": {
+      "x": 49.7,
+      "y": 45.5
+    }
+  },
+  {
+    "id": "park-old-border",
+    "a": "parkovy",
+    "b": "old-city",
+    "type": "border",
+    "name": "Граница Парковый-Старый город",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  },
+  {
+    "id": "old-port-border",
+    "a": "old-city",
+    "b": "portovy",
+    "type": "border",
+    "name": "Граница Старый город-Портовый",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  },
+  {
+    "id": "prom-port-border",
+    "a": "promzona",
+    "b": "portovy",
+    "type": "border",
+    "name": "Граница Промзона-Портовый",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  },
+  {
+    "id": "prom-prim-border",
+    "a": "promzona",
+    "b": "primorsky",
+    "type": "border",
+    "name": "Граница Промзона-Приморский",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  },
+  {
+    "id": "port-prim-border",
+    "a": "portovy",
+    "b": "primorsky",
+    "type": "border",
+    "name": "Граница Портовый-Приморский",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  },
+  {
+    "id": "boatman-ferry",
+    "a": "bogateevo",
+    "b": "promzona",
+    "type": "ferry",
+    "name": "Паром лодочника Богатеево-Промзона",
+    "energy": 2,
+    "enabled": true,
+    "toll": {
+      "bloodTier1": 1
+    },
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  },
+  {
+    "id": "fish-port-border",
+    "a": "spalnik",
+    "b": "portovy",
+    "type": "border",
+    "name": "Граница Рыбацкая деревня-Портовый",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  },
+  {
+    "id": "akadem-portovy-bridge",
+    "a": "akadem",
+    "b": "portovy",
+    "type": "bridge",
+    "name": "Мост Академгородок-Портовый",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": {
+      "x": 57.77,
+      "y": 57.34
+    },
+    "bendEnabled": false,
+    "bend": null,
+    "to": {
+      "x": 57.52,
+      "y": 52.28
+    }
+  },
+  {
+    "id": "zone-10-portovy-ferry",
+    "a": "zone-10",
+    "b": "portovy",
+    "type": "ferry",
+    "name": "Паром Спальник-Портовый",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": {
+      "x": 46.3,
+      "y": 88.44
+    },
+    "bendEnabled": true,
+    "bend": {
+      "x": 65.89,
+      "y": 90.62
+    },
+    "to": {
+      "x": 67.57,
+      "y": 57.63
+    }
+  },
+  {
+    "id": "primorsky-zone-10-ferry",
+    "a": "primorsky",
+    "b": "zone-10",
+    "type": "ferry",
+    "name": "Паром Приморский-Спальник",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": {
+      "x": 94.84,
+      "y": 42.92
+    },
+    "bendEnabled": true,
+    "bend": {
+      "x": 84,
+      "y": 100
+    },
+    "to": {
+      "x": 46.3,
+      "y": 88.49
+    }
+  },
+  {
+    "id": "kosa-spalnik-border",
+    "a": "kosa",
+    "b": "spalnik",
+    "type": "border",
+    "name": "Граница Коса-Рыбацкая деревня",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  },
+  {
+    "id": "spalnik-primorsky-border",
+    "a": "spalnik",
+    "b": "primorsky",
+    "type": "border",
+    "name": "Граница Рыбацкая деревня-Приморский",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  },
+  {
+    "id": "zone-10-old-city-border",
+    "a": "zone-10",
+    "b": "old-city",
+    "type": "border",
+    "name": "Граница Спальник-Старый город",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  },
+  {
+    "id": "zone-10-parkovy-border",
+    "a": "zone-10",
+    "b": "parkovy",
+    "type": "border",
+    "name": "Граница Спальник-Парковый",
+    "energy": 2,
+    "enabled": true,
+    "toll": {},
+    "color": "",
+    "from": null,
+    "bendEnabled": false,
+    "bend": null,
+    "to": null
+  }
+]

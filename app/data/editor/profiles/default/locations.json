@@ -1,0 +1,350 @@
+[
+  {
+    "id": "donor-center",
+    "zoneId": "portovy",
+    "name": "Донорский центр",
+    "symbol": "ДЦ",
+    "accent": "#d9485f",
+    "position": {
+      "x": 64.8453480450058,
+      "y": 50.39081322764617
+    },
+    "description": "Источник сырой крови и лабораторных задач для интеллектуальных агентов.",
+    "mechanics": [
+      {
+        "id": "counter",
+        "type": "counter",
+        "name": "Подозрения",
+        "counterType": "fillable_decaying",
+        "segments": 6,
+        "value": 0,
+        "thresholds": [
+          {
+            "id": "threshold",
+            "value": 4,
+            "direction": "up",
+            "repeat": "each_crossing",
+            "mode": "above",
+            "effects": [
+              {
+                "type": "task_lock",
+                "taskId": "donor-center-task-1",
+                "locked": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "visibilityConditions": []
+  },
+  {
+    "id": "retirement-home",
+    "zoneId": "primorsky",
+    "name": "Дом престарелых",
+    "symbol": "ДП",
+    "accent": "#dfb257",
+    "position": {
+      "x": 86.99402482049076,
+      "y": 39.962954481397965
+    },
+    "description": "Тихие задачи: стихи, танцы и кроссворды за деньги и репутацию.",
+    "mechanics": [
+      {
+        "id": "counter",
+        "type": "counter",
+        "name": "Доверие постояльцев",
+        "counterType": "fillable",
+        "segments": 5,
+        "value": 0,
+        "thresholds": [
+          {
+            "id": "threshold",
+            "value": 4,
+            "direction": "up",
+            "repeat": "each_crossing",
+            "mode": "crossing",
+            "effects": [
+              {
+                "type": "resource_delta",
+                "resource": "bloodTier1",
+                "amount": 5
+              },
+              {
+                "type": "mechanic_value_delta",
+                "mechanicId": "counter",
+                "amount": -4
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "visibilityConditions": []
+  },
+  {
+    "id": "upgrade-shop",
+    "zoneId": "spalnik",
+    "name": "Магазин апгрейдов",
+    "symbol": "АП",
+    "accent": "#8a73db",
+    "position": {
+      "x": 78.1645888773119,
+      "y": 60.32674939357504
+    },
+    "description": "Здесь покупают улучшения бара и пробуют выпросить подарок.",
+    "mechanics": [],
+    "visibilityConditions": [
+      {
+        "id": "visibility-1",
+        "trigger": "game_start",
+        "action": "hide",
+        "day": 1,
+        "weekday": 0,
+        "taskId": ""
+      }
+    ]
+  },
+  {
+    "id": "wholesale",
+    "zoneId": "promzona",
+    "name": "Склад Грача",
+    "symbol": "СГ",
+    "accent": "#48b6a7",
+    "position": {
+      "x": 57.59923261000214,
+      "y": 8.463385763388716
+    },
+    "description": "Склад крови, коробок и сомнительных ночных поставок.",
+    "mechanics": [
+      {
+        "id": "shop",
+        "type": "shop",
+        "name": "Магазин",
+        "sellOffers": [
+          {
+            "id": "offer-2",
+            "resource": "bloodTier2",
+            "price": 12,
+            "maxStock": 2,
+            "refill": "weekly",
+            "locked": false
+          },
+          {
+            "id": "offer-3",
+            "resource": "bloodTier3",
+            "price": 18,
+            "maxStock": 1,
+            "refill": "weekly",
+            "locked": true
+          }
+        ],
+        "buyOffers": []
+      },
+      {
+        "id": "scale",
+        "type": "scale",
+        "name": "Симпатия Грача",
+        "min": 0,
+        "max": 100,
+        "value": 0,
+        "thresholds": [
+          {
+            "id": "threshold",
+            "value": 50,
+            "direction": "up",
+            "repeat": "once",
+            "mode": "crossing",
+            "effects": [
+              {
+                "type": "shop_offer_lock",
+                "shopId": "shop",
+                "offerId": "offer-3",
+                "locked": false
+              }
+            ]
+          },
+          {
+            "id": "threshold-2",
+            "value": 80,
+            "direction": "up",
+            "repeat": "once",
+            "mode": "crossing",
+            "effects": [
+              {
+                "type": "shop_stock_delta",
+                "shopId": "shop",
+                "offerId": "offer-2",
+                "amount": 2
+              },
+              {
+                "type": "shop_stock_delta",
+                "shopId": "shop",
+                "offerId": "offer-3",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "visibilityConditions": []
+  },
+  {
+    "id": "bench",
+    "zoneId": "primorsky",
+    "name": "Лавочка",
+    "symbol": "Л",
+    "accent": "#6d9fce",
+    "position": {
+      "x": 76.66030450989392,
+      "y": 14.943348933476939
+    },
+    "description": "Место, где варят коктейли и устраивают посиделки с агентами.",
+    "mechanics": [],
+    "visibilityConditions": []
+  },
+  {
+    "id": "ovk-office",
+    "zoneId": "old-city",
+    "name": "Злая Клиника",
+    "symbol": "ОВК",
+    "accent": "#78b66c",
+    "position": {
+      "x": 39.55153977837826,
+      "y": 59.38612290780673
+    },
+    "description": "",
+    "mechanics": [],
+    "visibilityConditions": [
+      {
+        "id": "visibility-1",
+        "trigger": "game_start",
+        "action": "hide",
+        "day": 1,
+        "weekday": 0,
+        "taskId": ""
+      }
+    ]
+  },
+  {
+    "id": "ad-agency",
+    "zoneId": "parkovy",
+    "name": "Рекламное агентство",
+    "symbol": "РА",
+    "accent": "#dfb257",
+    "position": {
+      "x": 16.576988371239676,
+      "y": 55.60159193130888
+    },
+    "description": "Можно вложить деньги в кампанию и поднять репутацию бара.",
+    "mechanics": [],
+    "visibilityConditions": [
+      {
+        "id": "visibility-1",
+        "trigger": "game_start",
+        "action": "hide",
+        "day": 1,
+        "weekday": 0,
+        "taskId": ""
+      },
+      {
+        "id": "visibility-2",
+        "trigger": "day_number",
+        "action": "hide",
+        "day": 1,
+        "weekday": 0,
+        "taskId": ""
+      }
+    ]
+  },
+  {
+    "id": "mansion",
+    "zoneId": "bogateevo",
+    "name": "Поместье ОВК",
+    "symbol": "ПМ",
+    "accent": "#d9485f",
+    "position": {
+      "x": 32.29906698564778,
+      "y": 17.498854543986372
+    },
+    "description": "Богатые банкеты платят дорого, но требуют готовые коктейли.",
+    "mechanics": [],
+    "visibilityConditions": [
+      {
+        "id": "visibility-1",
+        "trigger": "game_start",
+        "action": "hide",
+        "day": 1,
+        "weekday": 0,
+        "taskId": ""
+      }
+    ]
+  },
+  {
+    "id": "location-9",
+    "zoneId": "kosa",
+    "name": "БарЖа Отшельника",
+    "symbol": "БЖО",
+    "accent": "#6d9fce",
+    "position": {
+      "x": 65.72630020983213,
+      "y": 83.57824823657357
+    },
+    "description": "",
+    "mechanics": [
+      {
+        "id": "scale",
+        "type": "scale",
+        "name": "Симпатия Отшельника",
+        "min": 0,
+        "max": 100,
+        "value": 0,
+        "thresholds": [
+          {
+            "id": "threshold",
+            "value": 25,
+            "direction": "up",
+            "repeat": "once",
+            "mode": "crossing",
+            "effects": []
+          }
+        ]
+      }
+    ],
+    "visibilityConditions": []
+  },
+  {
+    "id": "mint-greenhouse",
+    "zoneId": "akadem",
+    "name": "Мятная Оранжерея",
+    "symbol": "МОР",
+    "accent": "#48b6a7",
+    "position": {
+      "x": 59.973077787769796,
+      "y": 74.48487286522557
+    },
+    "description": "",
+    "mechanics": [
+      {
+        "id": "scale",
+        "type": "scale",
+        "name": "Симпатия Заведующей",
+        "min": 0,
+        "max": 100,
+        "value": 0,
+        "thresholds": [
+          {
+            "id": "threshold",
+            "value": 25,
+            "direction": "up",
+            "repeat": "once",
+            "mode": "crossing",
+            "effects": []
+          }
+        ]
+      }
+    ],
+    "visibilityConditions": []
+  }
+]

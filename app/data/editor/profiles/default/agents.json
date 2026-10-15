@@ -1,0 +1,90 @@
+[
+  {
+    "id": "anya",
+    "name": "Яна",
+    "role": "Готка",
+    "portrait": "Я",
+    "color": "#dfb257",
+    "maxEnergy": 20,
+    "energy": 10,
+    "baseRecovery": 8,
+    "fatigue": 0,
+    "isMainCharacter": false,
+    "sympathy": 20,
+    "overtimeMax": 5,
+    "overtimeLeft": 5,
+    "locationId": "donor-center",
+    "startLocationId": "bench",
+    "traits": [
+      "trait-1"
+    ],
+    "sympathyTraits": [],
+    "statuses": []
+  },
+  {
+    "id": "kolya",
+    "name": "Айсель",
+    "role": "Паркурщица",
+    "portrait": "А",
+    "color": "#48b6a7",
+    "maxEnergy": 36,
+    "energy": 24,
+    "baseRecovery": 8,
+    "fatigue": 0,
+    "isMainCharacter": false,
+    "sympathy": 5,
+    "overtimeMax": 10,
+    "overtimeLeft": 10,
+    "locationId": "wholesale",
+    "startLocationId": "bench",
+    "traits": [
+      "trait-2"
+    ],
+    "sympathyTraits": [],
+    "statuses": []
+  },
+  {
+    "id": "ksenia",
+    "name": "Женя",
+    "role": "Веган",
+    "portrait": "Ж",
+    "color": "#8a73db",
+    "maxEnergy": 32,
+    "energy": 16,
+    "baseRecovery": 8,
+    "fatigue": 0,
+    "isMainCharacter": false,
+    "sympathy": -5,
+    "overtimeMax": 8,
+    "overtimeLeft": 8,
+    "locationId": "upgrade-shop",
+    "startLocationId": "bench",
+    "traits": [
+      "smart"
+    ],
+    "sympathyTraits": [],
+    "statuses": []
+  },
+  {
+    "id": "protag",
+    "name": "Алекс",
+    "role": "The Bartender",
+    "portrait": "АЛ",
+    "color": "#8a73db",
+    "maxEnergy": 24,
+    "energy": 16,
+    "baseRecovery": 8,
+    "fatigue": 0,
+    "isMainCharacter": true,
+    "sympathy": 0,
+    "overtimeMax": 6,
+    "overtimeLeft": 6,
+    "locationId": "donor-center",
+    "startLocationId": "bench",
+    "traits": [
+      "lucky"
+    ],
+    "sympathyTraits": [],
+    "statuses": []
+  }
+]

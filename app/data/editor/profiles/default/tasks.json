@@ -1,0 +1,437 @@
+[
+  {
+    "id": "location-9-task-1",
+    "locationId": "location-9",
+    "name": "Обслуживать двигатель",
+    "kind": "check",
+    "stat": "intelligence",
+    "difficulty": 0,
+    "difficultyLevelId": "hard",
+    "maxPerDay": 2,
+    "description": "",
+    "costResources": {},
+    "rewards": {},
+    "success": {},
+    "failure": {},
+    "costEffects": [],
+    "rewardEffects": [],
+    "successEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 15
+      },
+      {
+        "type": "location_scale_decrease",
+        "scaleId": "scale",
+        "amount": 10
+      }
+    ],
+    "failureEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 5
+      },
+      {
+        "type": "grant_status",
+        "statusId": "stress",
+        "stacks": 1
+      }
+    ]
+  },
+  {
+    "id": "location-9-task-2",
+    "locationId": "location-9",
+    "name": "Разгружать трюм",
+    "kind": "check",
+    "stat": "agility",
+    "difficulty": 0,
+    "difficultyLevelId": "normal",
+    "maxPerDay": 2,
+    "description": "",
+    "costResources": {},
+    "rewards": {},
+    "success": {},
+    "failure": {},
+    "costEffects": [],
+    "rewardEffects": [],
+    "successEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 10
+      },
+      {
+        "type": "location_scale_decrease",
+        "scaleId": "scale",
+        "amount": 10
+      }
+    ],
+    "failureEffects": [
+      {
+        "type": "agent_parameter_delta",
+        "parameter": "fatigue",
+        "amount": 1
+      },
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 5
+      }
+    ]
+  },
+  {
+    "id": "mint-greenhouse-task-1",
+    "locationId": "mint-greenhouse",
+    "name": "Работать в оранжерее",
+    "kind": "check",
+    "stat": "agility",
+    "difficulty": 0,
+    "difficultyLevelId": "normal",
+    "maxPerDay": 2,
+    "description": "",
+    "costResources": {},
+    "rewards": {},
+    "success": {},
+    "failure": {},
+    "costEffects": [],
+    "rewardEffects": [],
+    "successEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 5
+      },
+      {
+        "type": "location_scale_decrease",
+        "scaleId": "scale",
+        "amount": 15
+      },
+      {
+        "type": "grant_status",
+        "statusId": "vigor",
+        "stacks": 1
+      }
+    ],
+    "failureEffects": [
+      {
+        "type": "location_scale_decrease",
+        "scaleId": "scale",
+        "amount": -10
+      },
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 5
+      }
+    ]
+  },
+  {
+    "id": "mint-greenhouse-task-2",
+    "locationId": "mint-greenhouse",
+    "name": "Попить чаю с Заведующей",
+    "kind": "check",
+    "stat": "charisma",
+    "difficulty": 0,
+    "difficultyLevelId": "hard",
+    "maxPerDay": 1,
+    "description": "",
+    "costResources": {},
+    "rewards": {},
+    "success": {},
+    "failure": {},
+    "costEffects": [],
+    "rewardEffects": [],
+    "successEffects": [
+      {
+        "type": "grant_status",
+        "statusId": "inspiration",
+        "stacks": 2
+      },
+      {
+        "type": "grant_status",
+        "statusId": "vigor",
+        "stacks": 2
+      },
+      {
+        "type": "location_scale_decrease",
+        "scaleId": "scale",
+        "amount": 25
+      }
+    ],
+    "failureEffects": [
+      {
+        "type": "grant_status",
+        "statusId": "inspiration",
+        "stacks": 1
+      },
+      {
+        "type": "grant_status",
+        "statusId": "vigor",
+        "stacks": 1
+      }
+    ]
+  },
+  {
+    "id": "wholesale-task-1",
+    "locationId": "wholesale",
+    "name": "Работать на складе",
+    "kind": "check",
+    "stat": "agility",
+    "difficulty": 0,
+    "difficultyLevelId": "easy",
+    "maxPerDay": 3,
+    "description": "",
+    "costResources": {},
+    "rewards": {},
+    "success": {},
+    "failure": {},
+    "costEffects": [],
+    "rewardEffects": [],
+    "successEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "bloodTier1",
+        "amount": 2
+      },
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 5
+      },
+      {
+        "type": "resource_delta",
+        "resource": "bloodTier2",
+        "amount": 1
+      },
+      {
+        "type": "location_scale_decrease",
+        "scaleId": "scale",
+        "amount": 10
+      }
+    ],
+    "failureEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "bloodTier1",
+        "amount": 1
+      },
+      {
+        "type": "agent_parameter_delta",
+        "parameter": "fatigue",
+        "amount": 1
+      },
+      {
+        "type": "location_scale_decrease",
+        "scaleId": "scale",
+        "amount": -10
+      }
+    ]
+  },
+  {
+    "id": "wholesale-task-2",
+    "locationId": "wholesale",
+    "name": "Препираться",
+    "kind": "check",
+    "stat": "charisma",
+    "difficulty": 0,
+    "difficultyLevelId": "hard",
+    "maxPerDay": 1,
+    "description": "",
+    "costResources": {},
+    "rewards": {},
+    "success": {},
+    "failure": {},
+    "costEffects": [],
+    "rewardEffects": [],
+    "successEffects": [
+      {
+        "type": "location_scale_decrease",
+        "scaleId": "scale",
+        "amount": 25
+      },
+      {
+        "type": "grant_status",
+        "statusId": "inspiration",
+        "stacks": 2
+      }
+    ],
+    "failureEffects": [
+      {
+        "type": "location_scale_decrease",
+        "scaleId": "scale",
+        "amount": -10
+      },
+      {
+        "type": "grant_status",
+        "statusId": "stress",
+        "stacks": 1
+      }
+    ]
+  },
+  {
+    "id": "retirement-home-task-1",
+    "locationId": "retirement-home",
+    "name": "Вечер танцев",
+    "kind": "check",
+    "stat": "agility",
+    "difficulty": 0,
+    "difficultyLevelId": "easy",
+    "maxPerDay": 1,
+    "description": "",
+    "costResources": {},
+    "rewards": {},
+    "success": {},
+    "failure": {},
+    "costEffects": [],
+    "rewardEffects": [],
+    "successEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 5
+      },
+      {
+        "type": "resource_delta",
+        "resource": "reputation",
+        "amount": 2
+      },
+      {
+        "type": "location_counter_increase",
+        "counterId": "counter",
+        "amount": 2
+      }
+    ],
+    "failureEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 5
+      }
+    ]
+  },
+  {
+    "id": "retirement-home-task-2",
+    "locationId": "retirement-home",
+    "name": "Вечер анекдотов",
+    "kind": "check",
+    "stat": "charisma",
+    "difficulty": 0,
+    "difficultyLevelId": "easy",
+    "maxPerDay": 1,
+    "description": "",
+    "costResources": {},
+    "rewards": {},
+    "success": {},
+    "failure": {},
+    "costEffects": [],
+    "rewardEffects": [],
+    "successEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 5
+      },
+      {
+        "type": "resource_delta",
+        "resource": "reputation",
+        "amount": 2
+      },
+      {
+        "type": "location_counter_increase",
+        "counterId": "counter",
+        "amount": 2
+      }
+    ],
+    "failureEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 5
+      }
+    ]
+  },
+  {
+    "id": "retirement-home-task-3",
+    "locationId": "retirement-home",
+    "name": "Вечер кроссвордов",
+    "kind": "check",
+    "stat": "intelligence",
+    "difficulty": 0,
+    "difficultyLevelId": "easy",
+    "maxPerDay": 1,
+    "description": "",
+    "costResources": {},
+    "rewards": {},
+    "success": {},
+    "failure": {},
+    "costEffects": [],
+    "rewardEffects": [],
+    "successEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 5
+      },
+      {
+        "type": "resource_delta",
+        "resource": "reputation",
+        "amount": 2
+      },
+      {
+        "type": "location_counter_increase",
+        "counterId": "counter",
+        "amount": 2
+      }
+    ],
+    "failureEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "money",
+        "amount": 5
+      }
+    ]
+  },
+  {
+    "id": "donor-center-task-1",
+    "locationId": "donor-center",
+    "name": "Воровать кровь",
+    "kind": "check",
+    "stat": "agility",
+    "difficulty": 0,
+    "difficultyLevelId": "normal",
+    "maxPerDay": 1,
+    "description": "",
+    "costResources": {},
+    "rewards": {},
+    "success": {},
+    "failure": {},
+    "costEffects": [],
+    "rewardEffects": [],
+    "successEffects": [
+      {
+        "type": "resource_delta",
+        "resource": "bloodTier1",
+        "amount": "[1, 4]"
+      },
+      {
+        "type": "resource_delta",
+        "resource": "bloodTier2",
+        "amount": "[0, 2]"
+      },
+      {
+        "type": "location_counter_increase",
+        "counterId": "counter",
+        "amount": 1
+      }
+    ],
+    "failureEffects": [
+      {
+        "type": "location_counter_increase",
+        "counterId": "counter",
+        "amount": 2
+      }
+    ]
+  }
+]

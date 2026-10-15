@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "format": "bloodbar-editor-split-config",
+  "collections": {
+    "gameSettings": "settings.json",
+    "initialResources": "resources.json",
+    "barSettings": "bar.json",
+    "agents": "agents.json",
+    "traits": "traits.json",
+    "upgrades": "upgrades.json",
+    "events": "events.json",
+    "statusEffects": "status-effects.json",
+    "activities": "activities.json",
+    "zones": "zones.json",
+    "paths": "paths.json",
+    "locations": "locations.json",
+    "tasks": "tasks.json"
+  }
+}

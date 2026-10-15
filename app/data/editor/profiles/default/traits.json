@@ -1,0 +1,57 @@
+[
+  {
+    "id": "trait-1",
+    "name": "Харизматик",
+    "description": "Даёт преимущество при проверках Харизмы",
+    "category": "custom",
+    "tags": [],
+    "effects": [
+      {
+        "type": "specialization",
+        "stat": "charisma"
+      }
+    ],
+    "disabled": false
+  },
+  {
+    "id": "trait-2",
+    "name": "Ловкач",
+    "description": "Даёт преимущество при проверках Ловкости",
+    "category": "custom",
+    "tags": [],
+    "effects": [
+      {
+        "type": "specialization",
+        "stat": "agility"
+      }
+    ],
+    "disabled": false
+  },
+  {
+    "id": "smart",
+    "name": "Умник",
+    "description": "Даёт преимущество при проверках Интеллекта",
+    "category": "custom",
+    "tags": [],
+    "effects": [
+      {
+        "type": "specialization",
+        "stat": "intelligence"
+      }
+    ],
+    "disabled": false
+  },
+  {
+    "id": "lucky",
+    "name": "Везунчик",
+    "description": "Получает 2 вдохновения каждый понедельник",
+    "category": "custom",
+    "tags": [],
+    "effects": [
+      {
+        "type": "weekly_inspiration"
+      }
+    ],
+    "disabled": false
+  }
+]
