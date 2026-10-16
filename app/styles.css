@@ -113,7 +113,26 @@ body[data-phase-mode="nighttime"] .editor-phase-switcher [data-phase-link="night
 .ingredient-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }.ingredient-groups h3 { margin: 0 0 4px; color: var(--muted); font-size: .68rem; text-transform: uppercase; }.ingredient-button { display: grid; width: 100%; gap: 1px; margin: 3px 0; padding: 5px 7px; border: 1px solid rgba(242,238,231,.13); border-radius: 6px; background: rgba(16,17,21,.5); text-align: left; cursor: pointer; }.ingredient-button:hover:not(:disabled) { border-color: var(--amber); background: rgba(223,178,87,.1); }.ingredient-button:disabled { opacity: .42; cursor: not-allowed; }.ingredient-button strong { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: .72rem; }.ingredient-quantity { color: var(--amber); font-size: .67rem; }.ingredient-button .ingredient-tag-list { gap: 3px; margin-top: 1px; }.ingredient-button .cocktail-tag { padding: 2px 4px; font-size: .58rem; }
 .ingredient-groups { align-items: start; }.film-combination-controls { display: grid; grid-template-columns: 1fr 1fr; align-self: start; align-content: start; gap: 7px; padding: 0; border: 0; background: transparent; }.film-combination-controls h3 { grid-column: 1 / -1; margin-bottom: 0; color: #c7b9ff; }.film-tag-select { min-width: 0; height: 38px; padding: 0 34px 0 10px; border: 1px solid rgba(242,238,231,.18); border-radius: 8px; background: rgba(12,13,17,.96); color: var(--ink); font: inherit; font-size: .73rem; }.film-tag-select:focus { outline: 1px solid var(--violet); border-color: var(--violet); }.film-add-button { grid-column: 1 / -1; justify-self: center; width: auto; margin: 3px 0 0; }.film-add-button:disabled { color: var(--muted); }
 .cocktail-slot .ingredient-tag-list { grid-column: 1; }
-@media (max-width: 960px) { .cocktail-workbench { grid-template-columns: 1fr 1fr; }.ingredient-panel { grid-column: 1 / -1; } } @media (max-width: 620px) { .nighttime-shell { padding-inline: 16px; }.cocktail-workbench { grid-template-columns: 1fr; }.ingredient-panel { grid-column: auto; }.ingredient-groups, .nighttime-preparation-controls { grid-template-columns: 1fr; }.satisfaction-heading { align-items: stretch; flex-direction: column; }.next-client-button { width: 100%; } }
+.nighttime-components-column { display: grid; min-width: 0; gap: 16px; }
+.bar-additives-panel h2 { font-size: 1rem; text-transform: uppercase; }
+.bar-additive-slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.bar-additive-cell { position: relative; min-width: 0; }
+.bar-additive-slot { height: 100%; min-height: 66px; margin: 0; padding: 10px; }
+.bar-additive-slot.empty { border-style: dashed; color: var(--muted); }
+.bar-additive-slot.filled { border-color: rgba(223,178,87,.45); }
+.bar-additive-slot strong { overflow-wrap: anywhere; }
+.bar-additive-clear { position: absolute; top: -7px; right: -7px; z-index: 1; background: var(--blood); }
+.bar-additive-hint { margin: 12px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.4; }
+.bar-additive-picker { position: fixed; z-index: 80; top: 90px; right: 20px; width: min(320px, calc(100vw - 40px)); max-height: calc(100dvh - 110px); overflow-y: auto; background: var(--panel); border-color: var(--amber); }
+.bar-additive-picker h2 { margin: 0; font-size: 1rem; text-transform: none; }
+.bar-additive-picker .ingredient-button { padding: 12px; }
+.bar-additive-picker .panel-heading { margin-bottom: 12px; }
+/* Leave the bar shelf usable while the component editor is open. */
+body[data-phase-mode="nighttime"] .editor-panel { left: 16px; right: auto; }
+@media (max-width: 960px) {
+  body[data-phase-mode="nighttime"] .editor-panel:not(.collapsed) { bottom: auto; height: 45dvh; }
+}
+@media (max-width: 960px) { .cocktail-workbench { grid-template-columns: 1fr 1fr; }.nighttime-components-column { grid-column: 1 / -1; } } @media (max-width: 620px) { .nighttime-shell { padding-inline: 16px; }.cocktail-workbench { grid-template-columns: 1fr; }.nighttime-components-column { grid-column: auto; }.ingredient-groups, .nighttime-preparation-controls { grid-template-columns: 1fr; }.satisfaction-heading { align-items: stretch; flex-direction: column; }.next-client-button { width: 100%; } }
 
 body[data-phase-mode="nighttime"] [data-phase-surface="daytime"] {
   display: none;

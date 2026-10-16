@@ -1,14 +1,15 @@
-import { COCKTAIL_SLOT_CONFIG, LINKED_FILM_IDS, TAG_CATEGORY, TAG_DEFINITIONS, formatTagLabel, getIngredientById, getIngredients } from "./cocktail-data.js";
+import { COCKTAIL_SLOT_CONFIG, LINKED_FILM_IDS, TAG_CATEGORY, TAG_DEFINITIONS, formatTagLabel, getActiveComponentProfileId, getIngredientById, getIngredients } from "./cocktail-data.js";
 import { createRandomPreferenceProfile, deleteClient, getRandomStoredClient, PREFERENCE_ATTITUDE, PREFERENCE_ATTITUDE_LABEL } from "./client-preferences.js";
 import { bindClientEditor, renderClientEditor } from "./client-editor.js";
 import { evaluateClientSatisfaction } from "./client-satisfaction.js";
 import { buildCocktail, getAvailableSlot } from "./cocktail-rules.js";
-import { consumeComponents, createRandomComponentInventory, getAvailableComponentUnits, hasComponentsForSlots } from "./component-inventory.js";
+import { consumeComponents, createRandomComponentInventory, getAvailableComponentUnits, hasComponentsForSlots, isBarAdditive } from "./component-inventory.js";
+import { loadBarAdditiveSlots, normalizeBarAdditiveSlots, saveBarAdditiveSlots, setBarAdditiveSlot } from "./bar-additives.js";
 import { getNighttimeSettings, updateNighttimeSettings } from "./settings.js";
 import { bindComponentEditorEvents, renderComponentEditor, renderComponentEditorProfileBar } from "./component-editor.js";
 import { registerDebugPanelController } from "../debug-panel.js";
 
-const groupLabels = { plasma: "Плазма", erythrocytes: "Эритроциты", film: "Плёнка", additive: "Добавки" };
+const groupLabels = { plasma: "Плазма", erythrocytes: "Эритроциты", film: "Плёнка", additive: "Медицинские добавки" };
 const categoryLabels = {
   [TAG_CATEGORY.flavor]: "Вкус",
   [TAG_CATEGORY.bloodGroup]: "Группа крови",
@@ -370,6 +371,7 @@ function syncSharedEditor(mode, state) {
       state.editing = !state.editing;
       syncEditorVisibility();
       toggle.innerHTML = state.editing ? '<span class="button-icon" aria-hidden="true">▶</span>Игра' : '<span class="button-icon" aria-hidden="true">✎</span>Редактор';
+      render(document.querySelector("#nighttimeRoot"), state);
     });
     collapseButton.addEventListener("click", () => {
       state.editorCollapsed = !state.editorCollapsed;
@@ -378,12 +380,89 @@ function syncSharedEditor(mode, state) {
   }
 }
 
+function createBarAdditivesPanel(root, state) {
+  const profileId = getActiveComponentProfileId();
+  if (state.barProfileId !== profileId) {
+    state.barSlots = loadBarAdditiveSlots(profileId);
+    state.barProfileId = profileId;
+    state.barPickerSlot = null;
+  }
+  state.barSlots = normalizeBarAdditiveSlots(state.barSlots);
+  const panel = node("section", "cocktail-panel bar-additives-panel");
+  panel.setAttribute("aria-label", "Барные добавки");
+  panel.append(node("h2", "", "Барные добавки"));
+  const shelf = node("div", "bar-additive-slots");
+  state.barSlots.forEach((ingredientId, index) => {
+    const entry = getIngredientById(ingredientId);
+    const cell = node("div", "bar-additive-cell");
+    const button = node("button", "ingredient-button bar-additive-slot" + (entry ? " filled" : " empty"));
+    button.type = "button";
+    button.dataset.barSlot = String(index);
+    button.dataset.ingredientId = entry?.id || "";
+    button.setAttribute("aria-label", entry ? `Добавить в коктейль: ${entry.name}` : `Выбрать барную добавку: слот ${index + 1}`);
+    button.disabled = Boolean(entry && (state.editing || !getAvailableSlot(state.slots, entry)));
+    const title = node("strong", "", entry?.name || "+ Выбрать добавку");
+    if (entry) title.append(node("span", "ingredient-quantity", "∞"));
+    button.append(title);
+    if (entry) button.append(ingredientTagList(entry));
+    button.addEventListener("click", () => {
+      if (!entry) { state.barPickerSlot = index; render(root, state); return; }
+      const slot = getAvailableSlot(state.slots, entry);
+      if (!state.editing && slot) { state.slots[slot.id] = entry.id; state.prepared = false; render(root, state); }
+    });
+    cell.append(button);
+    if (entry && state.editing) {
+      const clear = node("button", "icon-button bar-additive-clear", "×");
+      clear.type = "button";
+      clear.dataset.barClear = String(index);
+      clear.setAttribute("aria-label", `Очистить барный слот: ${entry.name}`);
+      clear.addEventListener("click", () => {
+        state.barSlots = saveBarAdditiveSlots(setBarAdditiveSlot(state.barSlots, index, ""));
+        state.barPickerSlot = null;
+        render(root, state);
+      });
+      cell.append(clear);
+    }
+    shelf.append(cell);
+  });
+  panel.append(shelf, node("p", "bar-additive-hint", state.editing ? "Очистите ячейку крестиком, чтобы выбрать другую добавку." : "Запас бесконечный. Для замены добавки включите редактор."));
+  if (state.barPickerSlot !== null) {
+    const picker = node("aside", "cocktail-panel bar-additive-picker");
+    picker.setAttribute("aria-label", "Выбор барной добавки");
+    const heading = node("div", "panel-heading");
+    const close = node("button", "icon-button", "×");
+    close.type = "button";
+    close.setAttribute("aria-label", "Закрыть выбор добавки");
+    close.addEventListener("click", () => { state.barPickerSlot = null; render(root, state); });
+    heading.append(node("h2", "", "Выберите добавку"), close);
+    picker.append(heading);
+    const choices = getIngredients().filter(isBarAdditive);
+    choices.forEach((entry) => {
+      const button = node("button", "ingredient-button");
+      button.type = "button";
+      button.dataset.barChoice = entry.id;
+      button.disabled = state.barSlots.includes(entry.id);
+      button.append(node("strong", "", entry.name), ingredientTagList(entry));
+      if (button.disabled) button.append(node("span", "muted", "Уже выбрана"));
+      button.addEventListener("click", () => {
+        state.barSlots = saveBarAdditiveSlots(setBarAdditiveSlot(state.barSlots, state.barPickerSlot, entry.id));
+        state.barPickerSlot = null;
+        render(root, state);
+      });
+      picker.append(button);
+    });
+    if (!choices.length) picker.append(node("p", "muted", "Барных добавок нет. Добавьте их в редакторе компонентов."));
+    panel.append(picker);
+  }
+  return panel;
+}
+
 function render(root, state) {
   const cocktail = buildCocktail(state.slots, state.preparation);
   root.replaceChildren();
   const workbench = node("div", "cocktail-workbench");
   const settings = getNighttimeSettings();
-  const activeIngredients = getIngredients().filter((entry) => (entry.type !== "film" || settings.filmCombinationMode === "all" || LINKED_FILM_IDS.includes(entry.id)) && (!settings.resourceLimited || getIngredientUnits(state, entry.id) > 0));
+  const activeIngredients = getIngredients().filter((entry) => !isBarAdditive(entry) && (entry.type !== "film" || settings.filmCombinationMode === "all" || LINKED_FILM_IDS.includes(entry.id)) && (!settings.resourceLimited || getIngredientUnits(state, entry.id) > 0));
   const buildPanel = node("section", "cocktail-panel");
   const panelHeading = node("div", "panel-heading");
   const clear = node("button", "secondary-button compact-button", "Очистить");
@@ -394,6 +473,7 @@ function render(root, state) {
   COCKTAIL_SLOT_CONFIG.forEach((slot) => {
     const entry = getIngredientById(state.slots[slot.id]);
     const card = node("div", "cocktail-slot" + (entry ? " filled" : ""));
+    card.dataset.slotId = slot.id;
     card.append(node("span", "", slot.label), node("strong", "", entry?.name || "Пусто"));
     if (entry) card.append(ingredientTagList(entry));
     if (entry) {
@@ -461,6 +541,7 @@ function render(root, state) {
   const groups = node("div", "ingredient-groups");
   Object.entries(groupLabels).forEach(([type, label]) => {
     const group = node("div", "");
+    group.dataset.ingredientGroup = type;
     group.append(node("h3", "", label));
     if (type === "film" && getNighttimeSettings().filmCombinationMode === "all") {
       group.className = "film-combination-controls";
@@ -492,7 +573,9 @@ function render(root, state) {
     groups.append(group);
   });
   ingredientPanel.append(groups);
-  workbench.append(leftColumn, buildPanel, ingredientPanel);
+  const componentsColumn = node("div", "nighttime-components-column");
+  componentsColumn.append(ingredientPanel, createBarAdditivesPanel(root, state));
+  workbench.append(leftColumn, buildPanel, componentsColumn);
   syncSharedSettings(state.mode, state, root);
   syncSharedEditor(state.mode, state);
   root.append(workbench);
@@ -510,7 +593,7 @@ export function bootstrapNighttime({ adapter, mode }) {
     preparation: {},
     prepared: false,
     settingsOpen: false,
-    editing: false,
+    editing: mode === "full" && document.body.classList.contains("edit-mode"),
     editorCollapsed: false,
     editorTab: "components",
     clientEditorId: "",
@@ -518,6 +601,9 @@ export function bootstrapNighttime({ adapter, mode }) {
     clientNotice: "",
     filmFlavor: "bitter",
     filmBenefit: "invigorating",
+    barProfileId: null,
+    barSlots: [],
+    barPickerSlot: null,
     inventory: createRandomComponentInventory(getIngredients(), getNighttimeSettings()),
     clientProfile: createRandomPreferenceProfile(),
   };
@@ -525,6 +611,13 @@ export function bootstrapNighttime({ adapter, mode }) {
   registerNighttimeDebugCheats(state, root);
   window.addEventListener("nighttime-components-changed", () => render(root, state));
   window.addEventListener("nighttime-clients-changed", () => render(root, state));
+  if (mode === "full") {
+    document.querySelector("#modeToggleButton")?.addEventListener("click", () => {
+      state.editing = document.body.classList.contains("edit-mode");
+      state.barPickerSlot = null;
+      render(root, state);
+    });
+  }
   render(root, state);
   return { adapter, mode };
 }

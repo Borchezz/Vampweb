@@ -45,6 +45,7 @@ export function renderComponentEditor() {
             ${collapsedGroups.has(type) ? "" : ingredients.filter((ingredient) => ingredient.type === type).map((ingredient) => `
               <article class="nighttime-component-card" data-component-id="${escape(ingredient.id)}">
                 <div><strong>${escape(ingredient.name)}</strong></div>
+                ${ingredient.type === "additive" ? `<label class="editor-field"><span>Категория добавки</span><select data-component-additive-category aria-label="Категория ${escape(ingredient.name)}"><option value="medical" ${ingredient.additiveCategory !== "bar" ? "selected" : ""}>Медицинская</option><option value="bar" ${ingredient.additiveCategory === "bar" ? "selected" : ""}>Барная</option></select></label>` : ""}
                 <button class="icon-button" type="button" aria-label="Удалить ${escape(ingredient.name)}" data-component-delete="${escape(ingredient.id)}">×</button>
                 <div class="nighttime-component-tags">${tagControls(ingredient)}</div>
               </article>`).join("") || '<p class="muted">Нет компонентов.</p>'}
@@ -58,7 +59,7 @@ function createIngredient(type) {
   if (!name?.trim()) return;
   if (!typeLabels[type]) return;
   const id = `custom-${Date.now()}`;
-  saveHistory(); setIngredients([...getIngredients(), { id, name: name.trim(), type, tags: [] }]);
+  saveHistory(); setIngredients([...getIngredients(), { id, name: name.trim(), type, ...(type === "additive" ? { additiveCategory: "medical" } : {}), tags: [] }]);
 }
 
 export function bindComponentEditorEvents(root = document) {
@@ -83,6 +84,13 @@ export function bindComponentEditorEvents(root = document) {
     if (profileSelect) {
       history.past = []; history.future = [];
       setActiveComponentProfile(profileSelect.value);
+      return;
+    }
+    const categorySelect = event.target.closest("[data-component-additive-category]");
+    if (categorySelect) {
+      const card = categorySelect.closest("[data-component-id]");
+      saveHistory();
+      setIngredients(getIngredients().map((ingredient) => ingredient.id !== card?.dataset.componentId ? ingredient : { ...ingredient, additiveCategory: categorySelect.value === "bar" ? "bar" : "medical" }));
       return;
     }
     const degreeSelect = event.target.closest("[data-component-tag-degree]");

@@ -16,7 +16,13 @@ export const COCKTAIL_SLOT_CONFIG = [
   { id: "film", label: "Слот плёнки", accepts: ["film"] }, { id: "additive-1", label: "Добавка 1", accepts: ["additive"] }, { id: "additive-2", label: "Добавка 2", accepts: ["additive"] },
 ];
 const bloodGroups = [["o", "I (O)", "bloodO", "salty", null], ["a", "II (A)", "bloodA", "sweet", "invigorating"], ["b", "III (B)", "bloodB", "sour", "healing"], ["ab", "IV (AB)", "bloodAB", "bitter", "potential"]];
-const makeIngredient = (id, name, type, tags) => ({ id, name, type, tags });
+const makeIngredient = (id, name, type, tags) => ({ id, name, type, ...(type === "additive" ? { additiveCategory: "medical" } : {}), tags });
+export const BAR_ADDITIVES = [
+  ["additive-olive", "Оливка", "salty"],
+  ["additive-lemon", "Лимон", "sour"],
+  ["additive-grapefruit", "Грейпфрукт", "bitter"],
+  ["additive-cherry", "Коктейльная вишня", "sweet"],
+].map(([id, name, flavor]) => ({ id, name, type: "additive", additiveCategory: "bar", tags: [{ id: flavor, degree: 1 }] }));
 const filmPairs = [
   ["bitter", "potential"], ["sour", "healing"], ["sweet", "healing"], ["salty", "invigorating"],
 ];
@@ -37,10 +43,12 @@ export const INGREDIENTS = [
   makeIngredient("additive-sour-sweet", "Кисло-сладкий концентрат", "additive", [{ id: "sour", degree: 1 }, { id: "sweet", degree: 1 }]),
   makeIngredient("additive-bitter-tonic", "Горький тоник", "additive", [{ id: "bitter", degree: 1 }, { id: "invigorating", degree: 1 }]),
   makeIngredient("additive-healing-salt", "Целебная соль", "additive", [{ id: "healing", degree: 1 }, { id: "salty", degree: 1 }]),
+  ...BAR_ADDITIVES,
 ];
 export const INGREDIENT_BY_ID = Object.fromEntries(INGREDIENTS.map((entry) => [entry.id, entry]));
 
 const COMPONENTS_STORAGE_KEY = "bloodbar-nighttime-components";
+const COMPONENTS_STORAGE_VERSION = "2";
 const COMPONENT_PROFILES_STORAGE_KEY = "bloodbar-nighttime-component-profiles";
 const DEFAULT_COMPONENT_PROFILE = { id: "default", name: "Дефолт" };
 let editableIngredients = null;
@@ -51,24 +59,33 @@ function cloneIngredients(ingredients) {
   return ingredients.map((ingredient) => ({ ...ingredient, tags: ingredient.tags.map((tag) => ({ ...tag })) }));
 }
 
-function normalizeIngredients(value) {
+function normalizeIngredients(value, migrateLegacy = false) {
   if (!Array.isArray(value)) return cloneIngredients(INGREDIENTS);
-  return value
+  const ingredients = value
     .filter((ingredient) => ingredient && typeof ingredient.id === "string" && typeof ingredient.name === "string" && ["plasma", "erythrocytes", "film", "additive"].includes(ingredient.type) && Array.isArray(ingredient.tags))
     .map((ingredient) => ({
       id: ingredient.id,
       name: ingredient.name,
       type: ingredient.type,
+      ...(ingredient.type === "additive" ? { additiveCategory: ingredient.additiveCategory === "bar" ? "bar" : "medical" } : {}),
       tags: ingredient.tags.filter((tag) => TAG_DEFINITIONS[tag?.id]).map((tag) => ({ id: tag.id, degree: Math.max(1, Math.min(3, Number(tag.degree) || 1)) })),
     }));
+  // Old profiles had no subcategories. Preserve their contents and add the new bar catalog.
+  if (migrateLegacy && value.length && !value.some((ingredient) => ingredient?.additiveCategory)) {
+    const existingIds = new Set(ingredients.map((ingredient) => ingredient.id));
+    ingredients.push(...cloneIngredients(BAR_ADDITIVES.filter((ingredient) => !existingIds.has(ingredient.id))));
+  }
+  return ingredients;
 }
 
 export function getIngredients() {
   if (editableIngredients) return editableIngredients;
   try {
     const profileStorageKey = `${COMPONENTS_STORAGE_KEY}:${getActiveComponentProfileId()}`;
-    const value = localStorage.getItem(profileStorageKey) || (getActiveComponentProfileId() === DEFAULT_COMPONENT_PROFILE.id ? localStorage.getItem(COMPONENTS_STORAGE_KEY) : null);
-    editableIngredients = normalizeIngredients(JSON.parse(value || "null"));
+    const profileValue = localStorage.getItem(profileStorageKey);
+    const storageKey = profileValue ? profileStorageKey : getActiveComponentProfileId() === DEFAULT_COMPONENT_PROFILE.id ? COMPONENTS_STORAGE_KEY : profileStorageKey;
+    const value = profileValue || localStorage.getItem(storageKey);
+    editableIngredients = normalizeIngredients(JSON.parse(value || "null"), localStorage.getItem(`${storageKey}:version`) !== COMPONENTS_STORAGE_VERSION);
   } catch {
     editableIngredients = cloneIngredients(INGREDIENTS);
   }
@@ -78,7 +95,9 @@ export function getIngredients() {
 export function setIngredients(ingredients) {
   editableIngredients = normalizeIngredients(ingredients);
   try {
-    localStorage.setItem(`${COMPONENTS_STORAGE_KEY}:${getActiveComponentProfileId()}`, JSON.stringify(editableIngredients));
+    const storageKey = `${COMPONENTS_STORAGE_KEY}:${getActiveComponentProfileId()}`;
+    localStorage.setItem(storageKey, JSON.stringify(editableIngredients));
+    localStorage.setItem(`${storageKey}:version`, COMPONENTS_STORAGE_VERSION);
   } catch {
     // Редактор остаётся рабочим в памяти, если browser storage недоступен.
   }
@@ -138,6 +157,7 @@ export function createComponentProfile(name) {
   componentProfiles.push(profile);
   try {
     localStorage.setItem(`${COMPONENTS_STORAGE_KEY}:${profile.id}`, JSON.stringify(cloneIngredients(getIngredients())));
+    localStorage.setItem(`${COMPONENTS_STORAGE_KEY}:${profile.id}:version`, COMPONENTS_STORAGE_VERSION);
   } catch {
     // Новый профиль получит текущие компоненты в памяти при следующем открытии.
   }
@@ -156,7 +176,10 @@ export function deleteComponentProfile(profileId) {
   componentProfiles = componentProfiles.filter((item) => item.id !== profileId);
   if (activeComponentProfileId === profileId) activeComponentProfileId = componentProfiles[0].id;
   editableIngredients = null;
-  try { localStorage.removeItem(`${COMPONENTS_STORAGE_KEY}:${profileId}`); } catch { /* storage is optional */ }
+  try {
+    localStorage.removeItem(`${COMPONENTS_STORAGE_KEY}:${profileId}`);
+    localStorage.removeItem(`${COMPONENTS_STORAGE_KEY}:${profileId}:version`);
+  } catch { /* storage is optional */ }
   persistComponentProfiles();
   window.dispatchEvent(new Event("nighttime-components-changed"));
   return { ...profile };
@@ -168,7 +191,10 @@ export function overwriteComponentProfile(profileId) {
   const target = componentProfiles.find((profile) => profile.id === profileId);
   if (!target) throw new Error("Профиль для перезаписи не найден.");
   const ingredients = cloneIngredients(getIngredients());
-  try { localStorage.setItem(`${COMPONENTS_STORAGE_KEY}:${profileId}`, JSON.stringify(ingredients)); } catch { /* storage is optional */ }
+  try {
+    localStorage.setItem(`${COMPONENTS_STORAGE_KEY}:${profileId}`, JSON.stringify(ingredients));
+    localStorage.setItem(`${COMPONENTS_STORAGE_KEY}:${profileId}:version`, COMPONENTS_STORAGE_VERSION);
+  } catch { /* storage is optional */ }
   activeComponentProfileId = profileId;
   editableIngredients = ingredients;
   persistComponentProfiles();
