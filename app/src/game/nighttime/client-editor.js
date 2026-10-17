@@ -19,8 +19,8 @@ function renderClientList(clients) {
 
 function renderClientTag(client, attitude, tag) {
   const preference = client.preferences.find((item) => item.tagId === tag.id && item.attitude === attitude);
-  const degree = Math.max(1, Math.min(3, Number(preference?.degree) || 1));
-  const degreeControl = preference && attitude > 0 && tagSupportsDegree(tag.id) ? `<select aria-label="Степень тега ${escape(tag.label)}" data-client-degree="${escape(tag.id)}" data-client-attitude="${attitude}"><option value="1" ${degree === 1 ? "selected" : ""}>1</option><option value="2" ${degree === 2 ? "selected" : ""}>2</option><option value="3" ${degree === 3 ? "selected" : ""}>3</option></select>` : "";
+  const degree = Math.max(1, Math.trunc(Number(preference?.degree) || 1));
+  const degreeControl = preference && tagSupportsDegree(tag.id) ? `<input type="number" min="1" step="1" aria-label="Степень тега ${escape(tag.label)}" value="${degree}" data-client-degree="${escape(tag.id)}" data-client-attitude="${attitude}">` : "";
   return `<label class="nighttime-component-tag cocktail-tag tag-${tag.category}"><input type="checkbox" data-client-tag="${escape(tag.id)}" data-client-attitude="${attitude}" ${preference ? "checked" : ""}><span>${escape(tag.label)}</span>${degreeControl}</label>`;
 }
 

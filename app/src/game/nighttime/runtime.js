@@ -8,6 +8,7 @@ import { loadBarAdditiveSlots, normalizeBarAdditiveSlots, saveBarAdditiveSlots, 
 import { getNighttimeSettings, updateNighttimeSettings } from "./settings.js";
 import { bindComponentEditorEvents, renderComponentEditor, renderComponentEditorProfileBar } from "./component-editor.js";
 import { registerDebugPanelController } from "../debug-panel.js";
+import { clearCocktail, removeCocktailIngredient, startClientVisit } from "./recipe-session.js";
 
 const groupLabels = { plasma: "Плазма", erythrocytes: "Эритроциты", film: "Плёнка", additive: "Медицинские добавки" };
 const categoryLabels = {
@@ -27,12 +28,17 @@ function node(tagName, className, text) {
   return element;
 }
 
+function recipeCatalogSignature() {
+  return JSON.stringify(getIngredients().map(({ id, type, additiveCategory, tags, effects }) => ({ id, type, additiveCategory, tags, effects })));
+}
+
 function ingredientTagList(entry) {
   const tags = node("div", "ingredient-tag-list");
   entry.tags.forEach((tag) => {
     const definition = TAG_DEFINITIONS[tag.id];
     tags.append(node("span", "cocktail-tag tag-" + definition.category, formatTagLabel({ ...tag, ...definition })));
   });
+  if (entry.description) tags.append(node("span", "ingredient-description", entry.description));
   return tags;
 }
 
@@ -43,9 +49,7 @@ function getIngredientUnits(state, ingredientId) {
 
 function rollComponents(state) {
   state.inventory = createRandomComponentInventory(getIngredients(), getNighttimeSettings());
-  state.slots = {};
-  state.preparation = {};
-  state.prepared = false;
+  clearCocktail(state);
 }
 
 function registerNighttimeDebugCheats(state, root) {
@@ -71,14 +75,11 @@ function registerNighttimeDebugCheats(state, root) {
     `,
     handleAction: (action) => {
       if (action.dataset.debugAction === "clear-cocktail") {
-        state.slots = {};
-        state.preparation = {};
-        state.prepared = false;
+        clearCocktail(state);
       } else if (action.dataset.debugAction === "reroll-components") {
         rollComponents(state);
       } else if (action.dataset.debugAction === "random-client") {
-        state.clientProfile = createRandomPreferenceProfile();
-        state.clientNotice = "";
+        startClientVisit(state, createRandomPreferenceProfile());
       } else {
         return false;
       }
@@ -88,9 +89,9 @@ function registerNighttimeDebugCheats(state, root) {
   });
 }
 
-function createClientPanel(cocktail, profile, nextStored, nextRandom, notice = "") {
+export function createClientPanel(cocktail, profile, nextStored, nextRandom, notice = "") {
   const satisfaction = evaluateClientSatisfaction(cocktail, profile);
-  const preferenceByTagId = new Map(satisfaction.preferences.map((preference) => [preference.tagId, preference]));
+
   const panel = node("section", "cocktail-panel client-panel");
   const clientHeading = node("div", "panel-heading");
   const title = node("div", ""); title.append(node("p", "eyebrow", "Клиент"), node("h2", "", profile.name));
@@ -112,13 +113,17 @@ function createClientPanel(cocktail, profile, nextStored, nextRandom, notice = "
   columns.forEach((attitude) => {
     const cell = document.createElement("td");
     const tags = node("div", "client-preference-tags");
-    profile.preferences
+    satisfaction.preferences
       .filter((preference) => preference.attitude === attitude)
       .forEach((preference) => {
         const definition = TAG_DEFINITIONS[preference.tagId];
-        const evaluated = preferenceByTagId.get(preference.tagId);
-        const tag = node("span", "cocktail-tag tag-" + definition.category, preference.degree ? definition.label + " " + preference.degree : definition.label);
-        const showMarker = preference.attitude < 0 ? evaluated?.present : evaluated?.satisfied;
+        const evaluated = preference;
+        const tag = node("span", "cocktail-tag tag-" + definition.category + (preference.suppressed ? " tag-suppressed" : ""), preference.degree !== null && preference.degree !== undefined ? definition.label + " " + preference.degree : definition.label);
+        tag.dataset.preferenceIndex = String(preference.preferenceIndex);
+        tag.dataset.tagId = preference.tagId;
+        if (preference.suppressed) tag.title = "Пожелание временно подавлено добавкой и не учитывается в оценке.";
+        else if (preference.originalDegree !== undefined && preference.originalDegree !== preference.degree) tag.title = `Исходная степень: ${preference.originalDegree}. Изменено добавкой для текущего коктейля.`;
+        const showMarker = !preference.suppressed && (preference.attitude < 0 ? evaluated.present : evaluated.satisfied);
         if (showMarker) {
           const marker = node("span", "preference-progress " + (preference.attitude < 0 ? "negative" : evaluated.degreeDifference ? "partial" : "positive"), preference.attitude < 0 ? "×" : "✓");
           marker.setAttribute("aria-label", preference.attitude < 0 ? "Нежелательный тег добавлен" : evaluated.degreeDifference ? "Частично удовлетворено" : "Удовлетворено");
@@ -137,7 +142,7 @@ function createClientPanel(cocktail, profile, nextStored, nextRandom, notice = "
   return panel;
 }
 
-function createTagPanel(cocktail) {
+export function createTagPanel(cocktail) {
   const panel = node("section", "cocktail-panel");
   panel.append(node("p", "eyebrow", "Свойства"), node("h2", "", "Теги напитка"));
   const tagGroups = node("div", "tag-groups");
@@ -147,7 +152,12 @@ function createTagPanel(cocktail) {
     if (!tags.length) return;
     const group = node("section", "tag-category");
     const tagList = node("div", "tag-list");
-    tags.forEach((tag) => tagList.append(node("span", "cocktail-tag tag-" + tag.category, formatTagLabel(tag))));
+    tags.forEach((tag) => {
+      const chip = node("span", "cocktail-tag tag-" + tag.category + (tag.suppressed ? " tag-suppressed" : ""), tag.suppressed && tag.degree === 0 ? `${tag.label}${["flavor", "benefit"].includes(tag.category) || tag.id === "hemolysis" ? " 0" : ""}` : formatTagLabel(tag));
+      chip.dataset.tagId = tag.id;
+      if (tag.suppressed) chip.title = "Тег подавлен и не учитывается. Другие компоненты могут восстановить его.";
+      tagList.append(chip);
+    });
     group.append(node("h3", "", categoryLabels[category]), tagList);
     tagGroups.append(group);
   });
@@ -181,12 +191,13 @@ function createResultPanel(cocktail, profile, onNextClient) {
   panel.append(resultHeading);
   const score = node("strong", "satisfaction-score" + (result.score >= 0 ? " positive" : " negative"), (result.score >= 0 ? "+" : "") + result.score);
   panel.append(score, createSatisfactionScale(result.score));
+  if (result.satisfactionModifier) panel.append(node("p", "satisfaction-modifier", `Поправка добавок: ${result.satisfactionModifier > 0 ? "+" : ""}${result.satisfactionModifier}`));
   if (result.score >= 10) panel.append(node("p", "satisfaction-effect grand", "✦ Клиент в восторге"));
   else if (result.score >= 5) panel.append(node("p", "satisfaction-effect", "✦ Клиент заметно доволен"));
   const list = node("ul", "satisfaction-list");
   result.preferences.forEach((preference) => {
-    const item = node("li", "satisfaction-item " + (preference.satisfied ? "satisfied" : "unsatisfied"));
-    item.textContent = preference.label + (preference.degree ? " " + preference.degree : "") + ": " + (preference.satisfied ? "учтено" : "не учтено") + " (" + (preference.score >= 0 ? "+" : "") + preference.score + ")";
+    const item = node("li", "satisfaction-item " + (preference.suppressed ? "tag-suppressed" : preference.satisfied ? "satisfied" : "unsatisfied"));
+    item.textContent = preference.label + (preference.degree !== null && preference.degree !== undefined ? " " + preference.degree : "") + ": " + (preference.suppressed ? "подавлено, не учитывается" : preference.satisfied ? "учтено" : "не учтено") + " (" + (preference.score >= 0 ? "+" : "") + preference.score + ")";
     list.append(item);
   });
   panel.append(list);
@@ -248,7 +259,7 @@ function syncSharedSettings(mode, state, root) {
       balancedPreferences: balancedPreferences.checked,
     });
     if (nextSettings.resourceLimited && (nextSettings.resourceRandomMin !== settings.resourceRandomMin || nextSettings.resourceRandomMax !== settings.resourceRandomMax || nextSettings.resourceLimited !== settings.resourceLimited)) rollComponents(state);
-    if (!nextSettings.resourceLimited && settings.resourceLimited) { state.slots = {}; state.preparation = {}; state.prepared = false; }
+    if (!nextSettings.resourceLimited && settings.resourceLimited) clearCocktail(state);
     render(root, state);
   };
   min.addEventListener("change", apply); max.addEventListener("change", apply); filmMode.addEventListener("change", apply);
@@ -458,7 +469,8 @@ function createBarAdditivesPanel(root, state) {
 }
 
 function render(root, state) {
-  const cocktail = buildCocktail(state.slots, state.preparation);
+  if (state.barProfileId !== null && state.barProfileId !== getActiveComponentProfileId()) clearCocktail(state);
+  const cocktail = buildCocktail(state.slots, state.preparation, { profile: state.clientProfile, randomChoices: state.randomChoices });
   root.replaceChildren();
   const workbench = node("div", "cocktail-workbench");
   const settings = getNighttimeSettings();
@@ -467,7 +479,7 @@ function render(root, state) {
   const panelHeading = node("div", "panel-heading");
   const clear = node("button", "secondary-button compact-button", "Очистить");
   clear.type = "button";
-  clear.addEventListener("click", () => { state.slots = {}; state.preparation = {}; state.prepared = false; render(root, state); });
+  clear.addEventListener("click", () => { clearCocktail(state); render(root, state); });
   panelHeading.append(node("h2", "", "Коктейль"), clear);
   const slots = node("div", "cocktail-slots");
   COCKTAIL_SLOT_CONFIG.forEach((slot) => {
@@ -480,7 +492,7 @@ function render(root, state) {
       const remove = node("button", "", "×");
       remove.type = "button";
       remove.setAttribute("aria-label", "Убрать " + entry.name);
-      remove.addEventListener("click", () => { delete state.slots[slot.id]; state.prepared = false; render(root, state); });
+      remove.addEventListener("click", () => { removeCocktailIngredient(state, slot.id); render(root, state); });
       card.append(remove);
     }
     slots.append(card);
@@ -499,17 +511,18 @@ function render(root, state) {
   });
   const prepare = node("button", "primary-button nighttime-prepare", "Приготовить напиток");
   prepare.type = "button";
-  prepare.disabled = !cocktail.isComplete || state.prepared || (settings.resourceLimited && !hasComponentsForSlots(state.inventory, state.slots));
+  prepare.disabled = !cocktail.isComplete || cocktail.valid === false || state.prepared || (settings.resourceLimited && !hasComponentsForSlots(state.inventory, state.slots));
   prepare.addEventListener("click", () => {
+    if (!cocktail.isComplete || cocktail.valid === false || state.prepared) return;
     if (settings.resourceLimited && !hasComponentsForSlots(state.inventory, state.slots)) return;
     if (settings.resourceLimited) state.inventory = consumeComponents(state.inventory, state.slots);
     state.prepared = true;
     render(root, state);
   });
-  buildPanel.append(panelHeading, slots, preparationControls, prepare, node("p", "nighttime-result", state.prepared ? "Напиток готов. Компоненты списаны из запаса." : "Для приготовления нужен хотя бы один большой компонент."));
+  buildPanel.append(panelHeading, slots, preparationControls, prepare, node("p", "nighttime-result", cocktail.valid === false ? "Недопустимый рецепт: не более одной барной добавки." : state.prepared ? "Напиток готов. Компоненты списаны из запаса." : "Нужен хотя бы один большой компонент. Барная добавка — не более одной."));
 
   const leftColumn = node("div", "nighttime-left-column");
-  const resetClient = (profile) => { state.clientProfile = profile; state.clientNotice = ""; state.slots = {}; state.preparation = {}; state.prepared = false; render(root, state); };
+  const resetClient = (profile) => { startClientVisit(state, profile); render(root, state); };
   const nextStoredClient = () => {
     const client = getRandomStoredClient(Math.random, state.seenStoredClientIds);
     if (!client) { state.clientNotice = "Все постоянные клиенты уже были сегодня."; render(root, state); return; }
@@ -519,10 +532,7 @@ function render(root, state) {
   leftColumn.append(createClientPanel(cocktail, state.clientProfile, nextStoredClient, () => resetClient(createRandomPreferenceProfile()), state.clientNotice));
   leftColumn.append(state.prepared
     ? createResultPanel(cocktail, state.clientProfile, () => {
-      state.clientProfile = createRandomPreferenceProfile();
-      state.slots = {};
-      state.preparation = {};
-      state.prepared = false;
+      startClientVisit(state, createRandomPreferenceProfile());
       render(root, state);
     })
     : createTagPanel(cocktail));
@@ -552,7 +562,7 @@ function render(root, state) {
       const addFilm = node("button", "secondary-button compact-button film-add-button", "Добавить плёнку");
       addFilm.type = "button";
       const selectedFilm = getIngredientById("film-" + state.filmFlavor + "-" + state.filmBenefit);
-      addFilm.disabled = !getAvailableSlot(state.slots, selectedFilm) || getIngredientUnits(state, selectedFilm.id) < 1;
+      addFilm.disabled = !selectedFilm || !getAvailableSlot(state.slots, selectedFilm) || getIngredientUnits(state, selectedFilm.id) < 1;
       addFilm.addEventListener("click", () => { const slot = getAvailableSlot(state.slots, selectedFilm); if (slot) { state.slots[slot.id] = selectedFilm.id; state.prepared = false; render(root, state); } });
       flavorSelect.addEventListener("change", () => { state.filmFlavor = flavorSelect.value; render(root, state); });
       benefitSelect.addEventListener("change", () => { state.filmBenefit = benefitSelect.value; render(root, state); });
@@ -563,6 +573,7 @@ function render(root, state) {
     activeIngredients.filter((entry) => entry.type === type).forEach((entry) => {
       const button = node("button", "ingredient-button");
       button.type = "button";
+      button.dataset.ingredientId = entry.id;
       button.disabled = !getAvailableSlot(state.slots, entry) || getIngredientUnits(state, entry.id) < 1;
       const title = node("strong", "", entry.name);
       title.append(node("span", "ingredient-quantity", settings.resourceLimited ? "×" + getIngredientUnits(state, entry.id) : "∞"));
@@ -590,6 +601,8 @@ export function bootstrapNighttime({ adapter, mode }) {
     day: settlement?.day || 1,
     resourceCount: Object.keys(settlement?.resources || {}).length,
     slots: {},
+    randomChoices: {},
+    componentCatalogSignature: recipeCatalogSignature(),
     preparation: {},
     prepared: false,
     settingsOpen: false,
@@ -609,7 +622,14 @@ export function bootstrapNighttime({ adapter, mode }) {
   };
   root.dataset.phaseMode = mode;
   registerNighttimeDebugCheats(state, root);
-  window.addEventListener("nighttime-components-changed", () => render(root, state));
+  window.addEventListener("nighttime-components-changed", () => {
+    const signature = recipeCatalogSignature();
+    if (signature !== state.componentCatalogSignature) {
+      clearCocktail(state);
+      state.componentCatalogSignature = signature;
+    }
+    render(root, state);
+  });
   window.addEventListener("nighttime-clients-changed", () => render(root, state));
   if (mode === "full") {
     document.querySelector("#modeToggleButton")?.addEventListener("click", () => {

@@ -17,7 +17,11 @@ export const PREFERENCE_ATTITUDE_LABEL = {
   [PREFERENCE_ATTITUDE.stronglyLike]: "Очень хочет",
 };
 
-const preference = (tagId, attitude, degree = 1) => (attitude > 0 && tagSupportsDegree(tagId) ? { tagId, attitude, degree } : { tagId, attitude });
+const preference = (tagId, attitude, degree = 1) => {
+  const numeric = Number(degree);
+  const normalized = Number.isFinite(numeric) ? Math.max(1, Math.trunc(numeric)) : 1;
+  return tagSupportsDegree(tagId) ? { tagId, attitude, degree: normalized } : { tagId, attitude };
+};
 
 export const PREFERENCE_PROFILES = [
   {

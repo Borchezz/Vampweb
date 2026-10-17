@@ -7,18 +7,22 @@ function getBaseScore(attitude, settings) {
 }
 
 export function evaluateClientSatisfaction(cocktail, profile) {
-  const cocktailTags = new Map(cocktail.tags.map((tag) => [tag.id, tag]));
+  const cocktailTags = new Map(cocktail.tags.filter((tag) => !tag.suppressed && Number(tag.degree ?? 1) > 0).map((tag) => [tag.id, tag]));
   const settings = getNighttimeSettings();
-  const preferences = profile.preferences.map((preference) => {
+  const effectiveProfile = cocktail.effectiveProfile || profile;
+  const preferences = effectiveProfile.preferences.map((preference, preferenceIndex) => {
     const cocktailTag = cocktailTags.get(preference.tagId);
     const present = Boolean(cocktailTag);
-    const degree = preference.attitude > 0 && tagSupportsDegree(preference.tagId) ? preference.degree || 1 : null;
-    const degreeDifference = degree && present ? Math.abs((cocktailTag.degree || 1) - degree) : 0;
+    const degree = tagSupportsDegree(preference.tagId) ? preference.degree ?? 1 : null;
+    const degreeDifference = preference.attitude > 0 && degree && present ? Math.abs((cocktailTag.degree || 1) - degree) : 0;
     const adjustedScore = getBaseScore(preference.attitude, settings) / 2 ** degreeDifference;
-    const satisfied = preference.attitude === 0 || (preference.attitude > 0 ? present : !present);
-    const score = preference.attitude === 0 ? 0 : preference.attitude > 0 ? (present ? adjustedScore : -adjustedScore) : (present ? -getBaseScore(preference.attitude, settings) : 0);
+    const suppressed = Boolean(preference.suppressed || preference.degree === 0);
+    const satisfied = suppressed || preference.attitude === 0 || (preference.attitude > 0 ? present : !present);
+    const score = suppressed || preference.attitude === 0 ? 0 : preference.attitude > 0 ? (present ? adjustedScore : -adjustedScore) : (present ? -getBaseScore(preference.attitude, settings) : 0);
     return {
       ...preference,
+      preferenceIndex,
+      suppressed,
       label: TAG_DEFINITIONS[preference.tagId]?.label || preference.tagId,
       attitudeLabel: PREFERENCE_ATTITUDE_LABEL[preference.attitude],
       present,
@@ -28,8 +32,10 @@ export function evaluateClientSatisfaction(cocktail, profile) {
       score,
     };
   });
+  const satisfactionModifier = Number.isFinite(cocktail.satisfactionModifier) ? cocktail.satisfactionModifier : 0;
   return {
-    score: preferences.reduce((total, preference) => total + preference.score, 0),
+    score: preferences.reduce((total, preference) => total + preference.score, 0) + satisfactionModifier,
+    satisfactionModifier,
     preferences,
   };
 }

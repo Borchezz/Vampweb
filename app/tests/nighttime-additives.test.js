@@ -21,8 +21,8 @@ test("legacy component profiles retain custom medical additives and gain the bar
   const data = await import("../src/game/nighttime/cocktail-data.js?legacy-test");
   const loaded = data.getIngredients();
   assert.equal(loaded.find((entry) => entry.id === "old-custom").additiveCategory, "medical");
-  assert.equal(loaded.filter((entry) => entry.additiveCategory === "bar").length, 4);
-  const customBar = { id: "custom-bar", name: "Барная", type: "additive", additiveCategory: "bar", tags: [] };
+  assert.equal(loaded.filter((entry) => entry.additiveCategory === "bar").length, 16);
+  const customBar = { id: "custom-bar", name: "Барная", type: "additive", additiveCategory: "bar", description: "", effects: [], tags: [] };
   data.setIngredients([customBar]);
   assert.equal(data.getIngredients()[0].additiveCategory, "bar");
   assert.equal(JSON.parse(storage.get("bloodbar-nighttime-components:default"))[0].additiveCategory, "bar");
@@ -75,7 +75,7 @@ test("deleting a component profile removes its version marker", async (t) => {
   data.setIngredients([]);
   const profile = data.createComponentProfile("Temporary");
   const storageKey = `bloodbar-nighttime-components:${profile.id}`;
-  assert.equal(storage.get(`${storageKey}:version`), "2");
+  assert.equal(storage.get(`${storageKey}:version`), "4");
   data.deleteComponentProfile(profile.id);
   assert.equal(storage.has(storageKey), false);
   assert.equal(storage.has(`${storageKey}:version`), false);
@@ -98,8 +98,8 @@ test("unsaved legacy migration survives repeated reloads for every storage sourc
       for (const reload of [1, 2]) {
         const data = await import(`../src/game/nighttime/cocktail-data.js?legacy-${source}-${reload}`);
         const loaded = data.getIngredients();
-        assert.deepEqual(loaded[0], { ...legacy[0], additiveCategory: "medical" });
-        assert.equal(loaded.filter((entry) => entry.additiveCategory === "bar").length, 4);
+        assert.deepEqual(loaded[0], { ...legacy[0], additiveCategory: "medical", description: "", effects: [] });
+        assert.equal(loaded.filter((entry) => entry.additiveCategory === "bar").length, 16);
         assert.deepEqual(JSON.parse(storage.get(storageKey)), legacy);
         assert.equal(storage.has(`${storageKey}:version`), false);
       }
@@ -118,7 +118,7 @@ test("default migration uses the version marker of the selected storage source",
       const selectedKey = source === "fallback" ? legacyKey : profileKey;
       const otherKey = source === "fallback" ? profileKey : legacyKey;
       storage.set(selectedKey, JSON.stringify(plasma));
-      storage.set(`${selectedKey}:version`, "2");
+      storage.set(`${selectedKey}:version`, "3");
       storage.set(`${otherKey}:version`, "1");
       if (source === "profile") storage.set(otherKey, JSON.stringify(INGREDIENTS));
       const current = await import(`../src/game/nighttime/cocktail-data.js?source-${source}-current`);
@@ -126,7 +126,7 @@ test("default migration uses the version marker of the selected storage source",
       storage.delete(`${selectedKey}:version`);
       storage.set(`${otherKey}:version`, "2");
       const legacy = await import(`../src/game/nighttime/cocktail-data.js?source-${source}-legacy`);
-      assert.equal(legacy.getIngredients().filter((entry) => entry.additiveCategory === "bar").length, 4);
+      assert.equal(legacy.getIngredients().filter((entry) => entry.additiveCategory === "bar").length, 16);
     });
   }
 });
@@ -146,8 +146,9 @@ test("bar additives stay unlimited while medical additives consume finite stock"
   assert.equal(hasComponentsForSlots({}, { "additive-1": "additive-tonic" }), false);
 });
 
-test("bar additives have the four requested names and single flavor tags", () => {
-  const bar = INGREDIENTS.filter((entry) => entry.type === "additive" && entry.additiveCategory === "bar");
+test("original bar additives retain their four names and single flavor tags", () => {
+  const originalIds = new Set(["additive-olive", "additive-lemon", "additive-grapefruit", "additive-cherry"]);
+  const bar = INGREDIENTS.filter((entry) => originalIds.has(entry.id));
   assert.deepEqual(bar.map(({ name, tags }) => ({ name, tags })), [
     { name: "Оливка", tags: [{ id: "salty", degree: 1 }] },
     { name: "Лимон", tags: [{ id: "sour", degree: 1 }] },
@@ -184,7 +185,9 @@ test("bar additives use the same two cocktail slots without duplicates and contr
   const olive = INGREDIENTS.find((ingredient) => ingredient.id === "additive-olive");
   const lemon = INGREDIENTS.find((ingredient) => ingredient.id === "additive-lemon");
   assert.equal(getAvailableSlot(recipe, olive), null);
-  assert.equal(getAvailableSlot(recipe, lemon).id, "additive-2");
+  assert.equal(getAvailableSlot(recipe, lemon), null, "Only one bar additive may be in a cocktail");
+  const medical = INGREDIENTS.find((ingredient) => ingredient.id === "additive-tonic");
+  assert.equal(getAvailableSlot(recipe, medical).id, "additive-2");
   assert.equal(getAvailableSlot({ ...recipe, "additive-2": "additive-tonic" }, lemon), null);
   const cocktail = buildCocktail(recipe);
   assert.equal(cocktail.isComplete, true);
