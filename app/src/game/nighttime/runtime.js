@@ -9,6 +9,7 @@ import { getNighttimeSettings, updateNighttimeSettings } from "./settings.js";
 import { bindComponentEditorEvents, renderComponentEditor, renderComponentEditorProfileBar } from "./component-editor.js";
 import { registerDebugPanelController } from "../debug-panel.js";
 import { clearCocktail, removeCocktailIngredient, startClientVisit } from "./recipe-session.js";
+import { createHintsPanel } from "./cocktail-hints.js";
 
 const groupLabels = { plasma: "Плазма", erythrocytes: "Эритроциты", film: "Плёнка", additive: "Медицинские добавки" };
 const categoryLabels = {
@@ -422,7 +423,7 @@ function createBarAdditivesPanel(root, state) {
       if (!state.editing && slot) { state.slots[slot.id] = entry.id; state.prepared = false; render(root, state); }
     });
     cell.append(button);
-    if (entry && state.editing) {
+    if (entry) {
       const clear = node("button", "icon-button bar-additive-clear", "×");
       clear.type = "button";
       clear.dataset.barClear = String(index);
@@ -436,7 +437,7 @@ function createBarAdditivesPanel(root, state) {
     }
     shelf.append(cell);
   });
-  panel.append(shelf, node("p", "bar-additive-hint", state.editing ? "Очистите ячейку крестиком, чтобы выбрать другую добавку." : "Запас бесконечный. Для замены добавки включите редактор."));
+  panel.append(shelf, node("p", "bar-additive-hint", "Запас бесконечный. Очистите ячейку крестиком и выберите другую добавку — редактор не нужен."));
   if (state.barPickerSlot !== null) {
     const picker = node("aside", "cocktail-panel bar-additive-picker");
     picker.setAttribute("aria-label", "Выбор барной добавки");
@@ -505,8 +506,8 @@ function render(root, state) {
   ].forEach(([key, label, apply]) => {
     const button = node("button", "secondary-button compact-button" + (state.preparation[key] ? " active" : ""), label);
     button.type = "button";
-    button.disabled = !cocktail.isComplete;
-    button.addEventListener("click", () => { apply(); state.prepared = false; render(root, state); });
+    button.disabled = !cocktail.isComplete || (key === "mixed" && cocktail.ingredients.length < 2);
+    button.addEventListener("click", () => { if (button.disabled) return; apply(); state.prepared = false; render(root, state); });
     preparationControls.append(button);
   });
   const prepare = node("button", "primary-button nighttime-prepare", "Приготовить напиток");
@@ -586,7 +587,9 @@ function render(root, state) {
   ingredientPanel.append(groups);
   const componentsColumn = node("div", "nighttime-components-column");
   componentsColumn.append(ingredientPanel, createBarAdditivesPanel(root, state));
-  workbench.append(leftColumn, buildPanel, componentsColumn);
+  const cocktailColumn = node("div", "nighttime-cocktail-column");
+  cocktailColumn.append(buildPanel, createHintsPanel());
+  workbench.append(leftColumn, cocktailColumn, componentsColumn);
   syncSharedSettings(state.mode, state, root);
   syncSharedEditor(state.mode, state);
   root.append(workbench);

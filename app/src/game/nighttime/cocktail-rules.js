@@ -8,6 +8,14 @@ const COMPATIBLE_ERYTHROCYTE_GROUPS_BY_PLASMA_GROUP = {
   B: ["O", "B"],
   AB: ["O", "A", "B", "AB"],
 };
+export function getBloodCompatibilityRows() {
+  return Object.entries(BLOOD_GROUP_BY_TAG_ID).map(([plasmaTagId, plasmaGroup]) => ({
+    plasmaTagId,
+    erythrocytes: Object.entries(BLOOD_GROUP_BY_TAG_ID).map(([tagId, group]) => ({
+      tagId, compatible: COMPATIBLE_ERYTHROCYTE_GROUPS_BY_PLASMA_GROUP[plasmaGroup].includes(group),
+    })),
+  }));
+}
 function addTag(tags, tagId, degree) {
   const definition = TAG_DEFINITIONS[tagId];
   if (!definition || !Number.isFinite(degree) || degree === 0 || (degree < 0 && !tags.has(tagId))) return;

@@ -171,13 +171,13 @@ test("shelf keeps exactly four distinct bar additives and rejects medical or mis
 
 test("shelf storage survives reload and stays separate for component profiles", (t) => {
   t.after(() => storage.clear());
-  assert.deepEqual(loadBarAdditiveSlots("profile-a"), ["", "", "", ""]);
+  assert.deepEqual(loadBarAdditiveSlots("profile-a"), ["additive-olive", "additive-lemon", "additive-grapefruit", "additive-cherry"]);
   saveBarAdditiveSlots(["additive-olive"], "profile-a");
   saveBarAdditiveSlots(["additive-lemon"], "profile-b");
   assert.deepEqual(loadBarAdditiveSlots("profile-a"), ["additive-olive", "", "", ""]);
   assert.deepEqual(loadBarAdditiveSlots("profile-b"), ["additive-lemon", "", "", ""]);
   storage.set("bloodbar-nighttime-bar-additive-slots:broken", "{");
-  assert.deepEqual(loadBarAdditiveSlots("broken"), ["", "", "", ""]);
+  assert.deepEqual(loadBarAdditiveSlots("broken"), ["additive-olive", "additive-lemon", "additive-grapefruit", "additive-cherry"]);
 });
 
 test("bar additives use the same two cocktail slots without duplicates and contribute one flavor degree", () => {

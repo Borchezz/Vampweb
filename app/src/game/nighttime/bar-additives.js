@@ -26,10 +26,12 @@ export function setBarAdditiveSlot(slots, index, ingredientId, ingredients = get
 }
 
 export function loadBarAdditiveSlots(profileId = getActiveComponentProfileId()) {
+  const defaults = ["additive-olive", "additive-lemon", "additive-grapefruit", "additive-cherry"];
   try {
-    return normalizeBarAdditiveSlots(JSON.parse(localStorage.getItem(`${STORAGE_KEY}:${profileId}`) || "null"));
+    const saved = JSON.parse(localStorage.getItem(`${STORAGE_KEY}:${profileId}`));
+    return normalizeBarAdditiveSlots(Array.isArray(saved) ? saved : defaults);
   } catch {
-    return normalizeBarAdditiveSlots(null);
+    return normalizeBarAdditiveSlots(defaults);
   }
 }
 

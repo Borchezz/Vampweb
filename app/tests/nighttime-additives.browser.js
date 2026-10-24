@@ -1,16 +1,16 @@
 // Run in an isolated browser with ?mode=nighttime or ?mode=full.
 // This test selects bar additives in that browser's localStorage.
 export function testBarShelfEditorReachable() {
-  if (document.querySelector("[data-bar-clear]") === null) document.querySelector("#modeToggleButton").click();
+  if (document.querySelector('#editorPanel').classList.contains('open')) document.querySelector("#modeToggleButton").click();
   document.querySelector(".bar-additives-panel").scrollIntoView({ block: "end" });
   const buttons = [...document.querySelectorAll("[data-bar-clear]")];
   if (!buttons.length) throw new Error("Need a filled shelf slot for reachability test");
   for (const clear of buttons) {
     const rect = clear.getBoundingClientRect();
     const hit = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
-    if (hit !== clear && !clear.contains(hit)) throw new Error(`Editor panel covers shelf clear button ${clear.dataset.barClear}`);
+    if (hit !== clear && !clear.contains(hit)) throw new Error(`Shelf clear button is obstructed: ${clear.dataset.barClear}`);
   }
-  return { passed: true, scenario: "editor-reachability", width: innerWidth, buttonsChecked: buttons.length };
+  return { passed: true, scenario: "play-mode-shelf-reachability", width: innerWidth, buttonsChecked: buttons.length };
 }
 
 export function testAdditiveCategoryEditor() {
@@ -64,7 +64,10 @@ export async function testBarAdditiveShelf() {
   const slots = () => [...document.querySelectorAll("[data-bar-slot]")];
   check(document.body.dataset.appReady === "true", "Application must be ready");
   check(slots().length === 4, "Bar shelf must have exactly four slots");
-  check(slots().every((slot) => !slot.dataset.ingredientId), "Bar shelf starts empty");
+  check(JSON.stringify(slots().map(slot => slot.dataset.ingredientId)) === JSON.stringify(['additive-olive', 'additive-lemon', 'additive-grapefruit', 'additive-cherry']), "New shelf starts with four standard bar additives");
+  document.querySelector('[data-bar-clear="0"]').click();
+  document.querySelector('[data-bar-clear="1"]').click();
+  check(!slots()[0].dataset.ingredientId && !slots()[1].dataset.ingredientId, "Default choices remain editable");
   check(document.querySelector(".nighttime-components-column > .ingredient-panel + .bar-additives-panel"), "Bar shelf is directly below components");
   check(document.querySelector(".ingredient-groups [data-ingredient-group=additive] h3")?.textContent === "Медицинские добавки", "Medical section must be renamed");
   slots()[0].click();
@@ -80,13 +83,12 @@ export async function testBarAdditiveShelf() {
   slots()[0].click();
   check(document.querySelector('.cocktail-slot[data-slot-id="additive-1"]')?.textContent.includes("Оливка"), "Filled shelf slot adds to cocktail");
   check(slots()[0].disabled, "Same additive cannot be added twice to one cocktail");
-  document.querySelector("#modeToggleButton").click();
   const clear = document.querySelector('[data-bar-clear="0"]');
-  check(clear && !clear.hidden, "Editor makes the shelf clear control available");
+  check(clear && !clear.hidden, "Play mode provides the shelf clear control");
   clear.click();
-  check(!slots()[0].dataset.ingredientId, "Editor clears only the chosen shelf slot");
+  check(!slots()[0].dataset.ingredientId, "Clear changes only the chosen shelf slot");
   check(slots()[1].dataset.ingredientId === "additive-lemon", "Other shelf slots stay intact");
-  document.querySelector("#modeToggleButton").click();
-  check(!document.querySelector("[data-bar-clear]"), "Clear control is unavailable in play mode");
+  check(document.querySelector("[data-bar-clear]"), "Other filled slots remain clearable in play mode");
+  check(!document.querySelector('#editorPanel').classList.contains('open'), "Shelf changes never enter the editor");
   return { passed: true, mode: document.body.dataset.phaseMode, savedSlot: slots()[1].dataset.ingredientId };
 }

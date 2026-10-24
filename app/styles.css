@@ -101,6 +101,26 @@ body[data-phase-mode="nighttime"] .editor-phase-switcher [data-phase-link="night
 .settings-panel { position: fixed; }
 .cocktail-workbench { display: grid; grid-template-columns: minmax(260px, .85fr) minmax(220px, .65fr) minmax(320px, 1.25fr); gap: 16px; align-items: start; }
 .nighttime-left-column { display: grid; gap: 16px; }
+.nighttime-cocktail-column { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; gap: 16px; }
+.cocktail-hints-panel { min-width: 0; }
+.cocktail-hints-panel h2 { font-size: 1rem; }
+.blood-compatibility-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: .65rem; }
+.blood-compatibility-table caption { margin-bottom: 8px; color: var(--amber); font-weight: 800; text-align: left; }
+.blood-compatibility-table th, .blood-compatibility-table td { padding: 7px 3px; border: 1px solid var(--line); text-align: center; overflow-wrap: anywhere; }
+.blood-compatibility-table th { background: rgba(109,159,206,.12); font-weight: 800; }
+.blood-compatibility-table td { font-size: .95rem; font-weight: 900; }
+.blood-compatible { color: #b6e89c; }
+.blood-incompatible { color: #ff9ca7; }
+.blood-compatibility-table .blood-compatible { background: rgba(120,182,108,.08); }
+.blood-compatibility-table .blood-incompatible { background: rgba(166,38,57,.1); }
+.hint-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 9px 0; font-size: .68rem; }
+.hint-note, .hint-tag-rule dd { color: var(--muted); font-size: .72rem; line-height: 1.5; overflow-wrap: anywhere; }
+.hint-note { margin: 8px 0 12px; }
+.hint-note:last-child { margin-bottom: 0; }
+.hint-subheading { margin: 18px 0 12px; font-size: .8rem; color: var(--amber); }
+.hint-tag-rules { display: grid; gap: 12px; margin: 0; }
+.hint-tag-rule dt { margin-bottom: 6px; }
+.hint-tag-rule dd { margin: 0; }
 .cocktail-panel { padding: 18px; border: 1px solid rgba(242,238,231,.14); border-radius: 12px; background: rgba(26,28,34,.78); box-shadow: var(--shadow); }
 .cocktail-panel h2 { margin-bottom: 14px; }.cocktail-slots { display: grid; gap: 8px; margin: 12px 0 16px; }
 .cocktail-slot { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; align-items: center; min-height: 58px; padding: 9px 10px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); }.cocktail-slot.filled { border-style: solid; border-color: rgba(223,178,87,.55); color: var(--ink); background: rgba(223,178,87,.07); }.cocktail-slot span { grid-column: 1; font-size: .68rem; font-weight: 800; text-transform: uppercase; }.cocktail-slot strong { grid-column: 1; font-size: .8rem; }.cocktail-slot button { grid-column: 2; grid-row: 1 / span 2; width: 26px; height: 26px; border-radius: 50%; background: rgba(166,38,57,.22); color: var(--ink); cursor: pointer; }
@@ -134,8 +154,8 @@ body[data-phase-mode="nighttime"] .editor-phase-switcher [data-phase-link="night
 .bar-additive-picker h2 { margin: 0; font-size: 1rem; text-transform: none; }
 .bar-additive-picker .ingredient-button { padding: 12px; }
 .bar-additive-picker .panel-heading { margin-bottom: 12px; }
-/* Leave the bar shelf usable while the component editor is open. */
-body[data-phase-mode="nighttime"] .editor-panel { left: 16px; right: auto; }
+/* Keep the right-hand editor within the viewport and compact on narrow screens. */
+body[data-phase-mode="nighttime"] .editor-panel { max-width: calc(100% - 32px); }
 @media (max-width: 960px) {
   body[data-phase-mode="nighttime"] .editor-panel:not(.collapsed) { bottom: auto; height: 45dvh; }
 }
